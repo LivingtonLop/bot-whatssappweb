@@ -51,9 +51,9 @@ class WhatssappWebLabels:
     TXT_TARGET_MESSAGE = ".//div[@class='_akbu']"
     TXT_COPYABLE_TEXT_ARG = ".//div[contains(@class, 'copyable-text')]"
     
-    TXT_SPAN_CASO_TAG_MEMBER_TO_COMMAND = ".//span[@class = 'x1ypdohk x1a06ls3 _ao3e selectable-text select-all copyable-text']" #data-jid(numero 51984579730@c.us) or data-display
+    TXT_SPAN_CASO_TAG_MEMBER_TO_COMMAND = ".//span[@class = 'x1ypdohk x1a06ls3 _ao3e selectable-text select-all copyable-text']" #data-jid(numero ------@c.us) or data-display
     TXT_RANGE_MEMBER_DISPLAY_INFO = ".//div[@class'_ak8i']"
-    # copyable-text div data-pre-plain-text #formate [3:37 PM, 1/30/2025] +54 9 11 6647-9470:  #autor
+    # copyable-text div data-pre-plain-text #formate [3:37 PM, 1/30/2025] +54 -----:  #autor
 
     #INPUTS
     INPUT_CONFIG_GROUP_CHAT = ".//div[@class='xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x13a6bvl x1q0g3np x6s0dn4 x1c4vz4f x2lah0s x14qfxbe']"
@@ -92,8 +92,8 @@ class WhatssappWebLabels:
 
     #atributes
     DATA_PRE_PLAIN_TEXT = "data-pre-plain-text"
-    # data-app-text-template   5491166479470@c.us
-    #data-jid 5491166479470@c.us
+    # data-app-text-template   ---@c.us
+    #data-jid ---@c.us
 
     # Expresión regular para capturar texto o número de teléfono + hora
     PATRON_HOUR = r"\b\d{1,2}:\d{2}\s?[APM]{2}\b" 
@@ -121,21 +121,3 @@ class WhatssappWebLabels:
         """Return xpath"""
         if content:
             return f".//div[@class='_akbu' and contains(., '{content}')]"
-
-"""
-
-_amk4 _amku ->gif
-
-_amk4 _amkv ->video
-
-
-_amk4 _amkt ->imagen
-
-
-_amk4 _amkd ->texto
-
-
-_amk4 _amk9 ->sticker
-
-
-"""
