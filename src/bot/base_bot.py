@@ -12,6 +12,7 @@ from src.bot.scripts import to_ver_chat_masive,to_return_ver_chat, to_ver_chat, 
 import re
 import time
 import threading
+from src.error_logger import ErrorLogger
 
 class Bot:
     def __init__(self, options:webdriver.ChromeOptions, data : dict, app_web : WhatssappWebLabels, list_black : list,list_grey : list,dict_country_codes : dict,list_link_spam : list, download: Download,data_json : DataJson):
@@ -44,13 +45,13 @@ class Bot:
         self.verifique_new_message_thread = threading.Thread(target=self.verifique_new_message, daemon=True)
         
 
-    def run(self):
+    def run(self, loger : ErrorLogger = None):
 
         try:
             self.init_run()
             time.sleep(3)
             
-            self.driver.execute_script(to_ver_chat_masive, self.app_web.CONTAINER_CHAT,self.app_web.QUERY_SELECTOR_MULTIMEDIA,3000,4)
+            self.driver.execute_script(to_ver_chat_masive, self.app_web.CONTAINER_CHAT,self.app_web.QUERY_SELECTOR_MULTIMEDIA,3000,10)
             self.driver.execute_script(to_ver_chat, self.app_web.CONTAINER_CHAT)
 
             while not self.stop_events.is_set():
@@ -66,15 +67,23 @@ class Bot:
             print("Finalizando Bot")  
             
         except WebDriverException as e:
+
+            
             if "Unable to find url to connect to from capabilities" in str(e):
                 print("⚠️ Error: No se puede encontrar la URL de conexión. Revisa la configuración del servidor.")
             else:
                 print(f"Error de WebDriver: {e}")
+                navegador = self.driver.get_log('browser')
+                loger.log(e)
+                loger.log(navegador)
+
 
         except Exception as e:
-            print(f"Error Inesperado (base bot) : {e}")   
-            close_session(driver=self.driver,data=self.data,app_web=self.app_web)  
+            print(f"Error Inesperado (base bot) : {e}")  
+            loger.log(e)
+
         finally:
+            close_session(driver=self.driver,data=self.data,app_web=self.app_web)  
             self.driver.quit()
 
     def caso_chat_restringe(self, value : bool):

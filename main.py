@@ -29,7 +29,7 @@ try:
         data_json= data_json
     )
 
-    bot.run()
+    bot.run(loger=logger)
     print("\033[ok\033[0m Bot Corriendo :)")
 
 except RunError as e:

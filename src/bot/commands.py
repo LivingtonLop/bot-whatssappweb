@@ -293,8 +293,24 @@ class Commands:
 
             if re.match(self.app_web.PATRON_LINK_YOUTUBE, url):
 
-                path, size = self.download_instance.download_audio(url=url)
+                path, size = self.download_instance.download_audio(url=url,duration=self.data["duration_limit_audio"])
 
+                #verificar si es stream o audios de mas de 10 minutos
+                if path == "is_live":
+                    message = "Este video/audio de youtube es un stream, y esta actualmente en transmicion, use otro audio/video, para su descargar, gracias uwu"
+                    edit_on_input(element=input_box, value=message)
+                    edit_on_input(element=input_box, value="ENTER")
+                    return
+                
+                #caso de audios de mas de 10 minutos
+                if path == "duration":
+                    audio = time.strftime("%H:%M:%S", time.gmtime(size))
+                    limite = time.strftime("%H:%M:%S", time.gmtime(self.data["duration_limit_audio"]))
+                    message = f"Este video/audio de youtube es muy pesado/duracion muy larga, el limite es de {limite}, y este tiene :{audio}, use otro audio/video, para su descargar, gracias uwu"
+                    edit_on_input(element=input_box, value=message)
+                    edit_on_input(element=input_box, value="ENTER")
+                                    
+                    return
                 
                 try:
                     if size < self.app_web.SIZE_LIMIT_AUDIO:

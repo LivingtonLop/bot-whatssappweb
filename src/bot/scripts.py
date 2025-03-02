@@ -9,7 +9,7 @@ if (chatContainer){
 
         for (var mutation of mutations) {
             mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1) { // Asegurar que es un elemento HTML
+                if (node.nodeType === 1 && node.getAttribute("role") === "row") { // Asegurar que es un elemento HTML
         
                     try {
                         
@@ -122,6 +122,9 @@ to_return_node ="""
 function obtenerYVaciarMensaje() {
     let message = window.message; // Guarda la referencia al nodo
     window.message = null; // Borra la referencia en window
+    if (message){
+        console.log(message);
+    }
     return message; // Devuelve el nodo
 }
 

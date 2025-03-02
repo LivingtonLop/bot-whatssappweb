@@ -22,7 +22,7 @@ class Download:
         self.output_folder = output_folder
         os.makedirs(self.output_folder, exist_ok=True)
 
-    def download_audio(self, url)->tuple[str,float]:
+    def download_audio(self, url,duration : int = 600)->tuple[str,float]:
         """Descargar el audio"""
 
         file_path:str = None
@@ -44,6 +44,16 @@ class Download:
             info = ydl.extract_info(url, download=False)
 
             raw_title = info["title"]
+
+            # Verificar si es un stream o dura más de 10 minutos
+            if info.get('is_live', False):
+                print(f"❌ El video '{info.get('title', 'Desconocido')}' es un stream. Se omite.")
+                return ("is_live",0.0)
+            
+            if info.get('duration', 0) > duration:  # 600 segundos = 10 minutos
+                print(f"❌ El video '{info.get('title', 'Desconocido')}' dura más de 10 minutos. Se omite.")
+                return ("duration",info.get('duration', 0))
+
             title = self.clean_filename(raw_title)
             # title = info.get('title', 'Unknown')
             artist = info.get('uploader', 'Unknown')

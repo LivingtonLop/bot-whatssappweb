@@ -5,7 +5,7 @@ from selenium import webdriver
 #Variables Constantes (Editables, antes de la ejecucion)
 
 GROUP_NAME = "Pongamoslo a prueba"
-# GROUP_NAME = "Artistas [ 2025 ]"
+#GROUP_NAME = "Artistas [ 2025 ]"
 
 APP_WEB = "https://web.whatsapp.com"
 #options
@@ -57,7 +57,8 @@ data = {
     "limite_repeat":10,
     "elemento_execute_command":50,
     "elemento_message":40,
-    "tiempo_maximo_hilo":5
+    "tiempo_maximo_hilo":5,
+    "duration_limit_audio":600
 
 }
 
