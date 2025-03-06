@@ -73,6 +73,7 @@ class Commands:
 
                 /r_link [days]: Restablecer/Resetear el enlace de invitacion del grupo, si pones los dias, seran los dias para hacerlo autamicamente, sinolopones conservara los dias, configurados anteriormente
 
+                /enlace : Manda el link de invitacion del grupo 
                 🪩Multimedia🪩 
 
                 /audio [link youtube]: Descarga y envía el audio desde YouTube en formato mp3 (máximo 16MB).
@@ -386,7 +387,7 @@ class Commands:
         edit_on_input(element=input_box, value="Reseteando link de invitacion")
         edit_on_input(element=input_box, value="ENTER")
 
-        reset_link_invitation(driver=self.driver,data=self.data, app_web=self.app_web)
+        res = reset_link_invitation(driver=self.driver,data=self.data, app_web=self.app_web)
 
         if days:
             #nuevo reseteo
@@ -394,4 +395,21 @@ class Commands:
             if self.json.add_date_time(date=get_datetime_to_three_days(days=int(days),date=date)):
                 edit_on_input(element=input_box, value=f"El link de invitacion, se reseteara el {self.json.get_datetime()}, en {days} dias uwu")
                 edit_on_input(element=input_box, value="ENTER")
+            
+            if res:
+                edit_on_input(element=input_box, value=f"Nuevo Enlace de invitacion: \n {res}")
+                edit_on_input(element=input_box, value="ENTER")
+                self.json.add_new_link(link=res)
+                edit_on_input(element=input_box, value=f"/admins Ha sido Reseteado el enlace")
+                edit_on_input(element=input_box, value="ENTER")
+                
+
+    @with_pause_handling("pause_events")
+    def enlace(self,*args)->None:
     
+        res = self.json.get_link()
+        if res:
+            input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
+            edit_on_input(element=input_box, value=f"Enlace de invitacion: \n {res}")
+            edit_on_input(element=input_box, value="ENTER")
+        

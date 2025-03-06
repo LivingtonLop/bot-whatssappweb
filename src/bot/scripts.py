@@ -122,9 +122,7 @@ to_return_node ="""
 function obtenerYVaciarMensaje() {
     let message = window.message; // Guarda la referencia al nodo
     window.message = null; // Borra la referencia en window
-    if (message){
-        console.log(message);
-    }
+
     return message; // Devuelve el nodo
 }
 
@@ -141,3 +139,7 @@ to_script_to_reinciar_observer = """
 
 """
 
+to_get_data_footer_contactos = """
+
+
+"""

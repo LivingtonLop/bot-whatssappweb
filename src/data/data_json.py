@@ -16,7 +16,9 @@ class DataJson:
                 "members": members if members else [],
                 "old_members": old_members if old_members else {},
                 "ban_members": ban_members if ban_members else [],
-                "auto":"2025-02-19"
+                "auto":"2025-02-19",
+                "link":"https://chat.whatsapp.com/G7eCBnX6sLy2PWQj8dxfg6"
+
             }
         }
 
@@ -176,3 +178,17 @@ class DataJson:
         group_data["auto"]=str(date)
         
         return self.save()
+
+    def add_new_link(self,link : str):
+        group_data = self.structure[self.group_name]
+
+        if "link" not in group_data:
+            group_data["link"] = str(link) 
+            return self.save()
+
+        group_data["link"]=str(link)
+        
+        return self.save()
+
+    def get_link(self):
+        return self.structure[self.group_name].get("link", False)

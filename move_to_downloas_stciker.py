@@ -2,7 +2,7 @@ import os
 import shutil
 import glob
 
-"""Scripts to manipalucin de multimedia"""
+"""Scripts to manipulacion de multimedia"""
 
 def move_recent_whatsapp_image(downloads_destine :str,downloads_folder = r"~/Downloads")->bool:
 
@@ -54,4 +54,3 @@ def move_recent_whatsapp_image(downloads_destine :str,downloads_folder = r"~/Dow
         
     return True
         
-

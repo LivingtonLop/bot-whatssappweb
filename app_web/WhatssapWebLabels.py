@@ -27,6 +27,7 @@ class WhatssappWebLabels:
     BTN_TO_CLOSE_2 = "//button[@title='Cerrar' and @aria-label='Cerrar']"
     # 
     BTN_RESET_ENLACE_INVITACION = "//div[@title='Restablecer enlace' and @aria-label='Restablecer enlace']"
+    BTN_COPY_ENLACE_INVITACION = "//div[@title='Copiar enlace' and @aria-label='Copiar enlace']"
     
     BTN_TO_ASIGN_ADMIN = ".//button[.//div[contains(text(), 'Designar como admin. del grupo')]]"
 

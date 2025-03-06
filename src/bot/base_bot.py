@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import StaleElementReferenceException,WebDriverException,JavascriptException
-from src.bot.actions import perform_login, open_group,edit_on_input,restringe_chat,delete_message_chat, ban_member,approve_or_reject_user,close_session,download_image,get_size_listmember
+from src.bot.actions import perform_login, open_group,edit_on_input,restringe_chat,delete_message_chat, ban_member,approve_or_reject_user,close_session,download_image,get_size_listmember,read_chat_group
 from src.bot.scraper import scrape_element
 from app_web.WhatssapWebLabels import WhatssappWebLabels
 from download import Download
@@ -43,6 +43,8 @@ class Bot:
         self.verify_requests_thread = threading.Thread(target=self.verify_requests, daemon=True)
         self.reset_variables_thread = threading.Thread(target=self.reset_variables,daemon=True)
         self.verifique_new_message_thread = threading.Thread(target=self.verifique_new_message, daemon=True)
+        self.verifique_new_command_in_node_thread = threading.Thread(target=self.verifique_old_messages, daemon=True)
+
         
 
     def run(self, loger : ErrorLogger = None):
@@ -147,10 +149,11 @@ class Bot:
         self.verify_requests_thread.start()
         self.reset_variables_thread.start()
         self.verifique_new_message_thread.start()
+        self.verifique_new_command_in_node_thread.start()
 
     def reset_variables(self):
 
-        while True:
+        while not self.stop_events.is_set():
             self.pause_events.wait()
             
             with self.lock:
@@ -162,7 +165,7 @@ class Bot:
 
     def verifique_new_message(self):
         """Verificamos el valor del mensaje """
-        while True:
+        while not self.stop_events.is_set():
             
             self.pause_events.wait()
 
@@ -196,6 +199,36 @@ class Bot:
                 print(f"Error, problemas con scriptos : {e}")
                 continue
 
+    def verifique_old_messages(self):
+        """Verificamos el valor del mensaje """
+        while not self.stop_events.is_set():
+            
+            self.pause_events.wait()
+            print("Revisando old messages")
+            try:
+                _,messages = read_chat_group(driver=self.driver,data=self.data,selector=self.app_web.TXT_CHAT_GROUP)
+
+                for target in reversed(messages):
+
+                    if target:
+                        
+                        message = scrape_element(driver=target,selector=self.app_web.TXT_TARGET_MESSAGE,timeout=self.data["time_wll"])
+
+                        if not self.detect_commando(message=message,target=target):
+                            """No es comando es un mensaje o mutimedia"""
+                            # print("No command")
+
+                        if not self.verifique_ban_or_kick(message=message,target_message=target):
+                            """Por que paso el filtro, o porque no es un mensaje/mensaje con imagen"""
+                            # print("No paso los filtros")
+
+            except StaleElementReferenceException as e:
+                print(f"Error, problemas con message, posiblemente eliminado {e}")
+                continue
+            finally:
+                print("Finallizando (10segundo dormir)")
+                time.sleep(10)
+
     def verifique_ban_or_kick(self, message : WebElement, target_message : WebElement)->bool:
         try:
             
@@ -213,6 +246,12 @@ class Bot:
                 return True
                     
             if re.search(self.regex_links_ban, message.text):
+                
+                link_grupo = self.json.get_link()
+
+                if re.search(link_grupo,message.text):
+                    return False
+
                 self.__algoritmo_ban(message=message,target_message=target_message)
                 return True
                     
@@ -227,7 +266,7 @@ class Bot:
             return False
 
     def verify_requests(self):
-        while True:
+        while not self.stop_events.is_set():
             # print(f"verefique:{self.pause_events.is_set()}")
             self.pause_events.wait()
             if not approve_or_reject_user(driver=self.driver, data=self.data,app_web=self.app_web,json=self.json):
@@ -446,6 +485,9 @@ class Bot:
         except StaleElementReferenceException as e:
             print(f"Error, problemas con message, posiblemente eliminado {e}")
             return
+        except IndexError:
+            print(f"No hay valor en el índice 0 {parts_message}")
+            return False
         
     def status_chat(self):
         if self.restringe_chat:

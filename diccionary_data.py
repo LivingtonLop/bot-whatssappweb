@@ -100,7 +100,6 @@ LIST_GREY = [
     "flaco",
     "peluca",
     "peruka",
-    "pues",
     "tonto",
     "mongol",
     "pavo",

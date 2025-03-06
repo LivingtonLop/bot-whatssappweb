@@ -4,8 +4,8 @@ from selenium import webdriver
 
 #Variables Constantes (Editables, antes de la ejecucion)
 
-GROUP_NAME = "Pongamoslo a prueba"
-#GROUP_NAME = "Artistas [ 2025 ]"
+#GROUP_NAME = "Pongamoslo a prueba"
+GROUP_NAME = "Artistas [ 2025 ]"
 
 APP_WEB = "https://web.whatsapp.com"
 #options

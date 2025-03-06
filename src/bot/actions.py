@@ -647,8 +647,10 @@ def get_size_listmember(driver:webdriver.Chrome,data:dict,app_web:WhatssappWebLa
     return scrape_data_size_list_member(driver=driver,selector=app_web.TXT_NUMERO_MIEMBROS,timeout=data["time_wll"])
 
 @handle_exceptions
-def reset_link_invitation(driver:webdriver.Chrome,data:dict,app_web:WhatssappWebLabels):
+def reset_link_invitation(driver:webdriver.Chrome,data:dict,app_web:WhatssappWebLabels)->str|None:
     
+    nuevo_enlace = None
+
     if not click_open_info_group(driver=driver,data=data,selector=app_web.BTN_INFO_GROUP):   
         print("Error En abrir el info grupo")
         return
@@ -665,6 +667,16 @@ def reset_link_invitation(driver:webdriver.Chrome,data:dict,app_web:WhatssappWeb
         print("Error En confirmar resetear el enlace de invitacion")
         return
     
+    time.sleep(2)
+
+    if not wait_element_to_be_clickable(driver=driver,selector=app_web.BTN_COPY_ENLACE_INVITACION,timeout=data["time_wll"]):
+        print("Error En resetear el enlace de invitacion")
+        return
+
+    #Tras dar click en copiar enlace, en teoria debe de estar en el portapapeles, lo obtenemos
+    nuevo_enlace = pyperclip.paste() 
+
     close_modal(driver=driver,data=data, selector=app_web.BTN_TO_BACK)
     close_modal(driver=driver,data=data, selector=app_web.BTN_TO_CLOSE)
     
+    return nuevo_enlace
