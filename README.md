@@ -25,7 +25,7 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 - **/promove [miembro]** - 🎖️ Promueve al usuario especificado a administrador del grupo.
 - **/despromove [miembro]** - ⏬ Revoca los privilegios de administrador de un miembro.
 - **/r\_link [días]** - 🔄 Restablece el enlace de invitación del grupo. Si se especifican días, se reseteará automáticamente en ese intervalo. Proporciona la fecha y el nuevo link.
-
+- **/enlace** -Trae el enlace de invitacion y lo imprime al grupo
 ---
 
 ### 🎵 Multimedia

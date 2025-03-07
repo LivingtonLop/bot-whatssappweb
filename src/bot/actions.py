@@ -67,9 +67,9 @@ def click_see_all_members(driver:webdriver.Chrome, data: dict, selector:str):
 
     if not wait_element_to_be_clickable(driver=driver, selector=selector, timeout=data["time_wll"]):
         print("Advertencia: No se pudo dar click en click_see_all_members. Terminando...")
-        return
+        return False
     print(f"✅ Elemento encontrado y clickeable. Abriendo Lista de miembros del grupo :{data["group_name"]}...")
-
+    return True
 @handle_exceptions
 def close_modal(driver:webdriver.Chrome, data: dict, selector:str):
     
@@ -105,8 +105,9 @@ def find_members(dict_country_code:dict,driver:webdriver.Chrome,data: dict, app_
         members.clear()
 
         """Buscaremos y daremo click a app_web@BTN_SEE_ALL_MEMBERS"""
-        click_see_all_members(driver=driver,data=data,selector=app_web.BTN_SEE_ALL_MEMBERS)
-
+        if not click_see_all_members(driver=driver,data=data,selector=app_web.BTN_SEE_ALL_MEMBERS):
+            print("Problemas en click see all members @findmembers")
+            return
         input_search = scrape_element(driver=driver, selector=app_web.TXT_SOURCE_MEMBERS, timeout=data["time_wll"])
 
         members = scrape_data_info_list_txt(driver=driver,list_data = members, selector=app_web.CONTAINER_LIST_MEMBERS,selector_item=app_web.TXT_INFO_MEMBER, timeout=data["time_wll"])
@@ -216,9 +217,9 @@ def ban_member(driver:webdriver.Chrome,id_member : str,data : dict, app_web : Wh
             
     else:
         if not click_see_all_members(driver=driver,data=data,selector=app_web.BTN_SEE_ALL_MEMBERS):
-            print("Advertencia: No se pudo dar click en all_members actions@ban_member ")
+            print("Problemas en click see all members @findmembers")
             return
-        
+
         input_search = scrape_element(driver=driver, selector=app_web.TXT_SOURCE_MEMBERS, timeout=data["time_wll"])
 
         if not input_search:
