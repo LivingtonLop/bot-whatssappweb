@@ -10,10 +10,11 @@ from app_web.WhatssapWebLabels import WhatssappWebLabels
 
 # from src.exceptions import TimeoutError, RunError, ElementInteractionError, ScraperError
 from src.bot.utils import wait_element_to_be_clickable, wait_element_to_be_clickable,actionschains_move_to_element,remove_emotes,str_to_bool
-from src.bot.scraper import scrape_data,scrape_data_info_btn,scrape_element, scrape_data_info_list_txt,scrape_data_parent,scrape_data_size_list_member
+from src.bot.scraper import scrape_data,scrape_data_info_btn,scrape_element, scrape_data_info_list_txt,scrape_data_parent,scrape_data_size_list_member,scrape_elements
 from src.data.data_json import DataJson
 # from src.error_logger import ErrorLogger
 from src.bot.decorators import handle_exceptions 
+from collections import Counter
 
 @handle_exceptions
 def perform_login(driver: webdriver.Chrome, url: str):
@@ -31,11 +32,11 @@ def open_group(driver:webdriver.Chrome, data : dict, selector : str):
     print("✅ Elemento encontrado y clickeable. Abriendo grupo...")
 
 @handle_exceptions    
-def edit_on_input(element:WebElement, value : str | tuple):
+def edit_on_input(element:WebElement, value : str | tuple, batch_input:int = 0):
         
     keys = None
     key = None
-
+    
     if isinstance(value, tuple):
             
         keys = [getattr(Keys, key,None) for key in value]
@@ -46,7 +47,10 @@ def edit_on_input(element:WebElement, value : str | tuple):
     else : 
         key = getattr(Keys, value,value)
         if key:
-            element.send_keys(key)
+            if batch_input > 0:
+                element.send_keys(key*batch_input)
+            else:
+                element.send_keys(key)
 
 @handle_exceptions    
 def read_chat_group(driver:webdriver.Chrome, data: dict, selector:str)->tuple[WebElement|None, list[WebElement]]:
@@ -99,8 +103,7 @@ def find_members(dict_country_code:dict,driver:webdriver.Chrome,data: dict, app_
         members.clear()
         time.sleep(10)
         members = scrape_data_info_list_txt(driver=driver,list_data = members, selector=app_web.DISPLAY_INFO_GROUP,selector_item=app_web.TXT_INFO_MEMBER, timeout=data["time_wll"])
-            
-
+        
     else:
         members.clear()
 
@@ -129,6 +132,88 @@ def find_members(dict_country_code:dict,driver:webdriver.Chrome,data: dict, app_
 
     return (members,admins)
     
+@handle_exceptions
+def get_member(data: dict, app_web : WhatssappWebLabels, driver:webdriver.Chrome)->tuple[list,list]:
+    """Codigo experimental"""
+    members= []
+    admins = []
+    estadistica_pos = 1.2
+    scroll_prox = -1500
+    stop_while = False
+    data_set = set()
+
+
+    click_open_info_group(driver=driver,data=data,selector=app_web.BTN_INFO_GROUP)
+
+    if scrape_data_info_btn(driver=driver, selector=app_web.CONTAINER_INFO_GROUP,selector_btn=app_web.BTN_SEE_OLD_MEMBERS, timeout=data["time_wll"]):
+        
+        """Caso que sea verdad que solo se pueda ver miembros, viejos, solo obtendremos la info de app_web@DISPLAY_INFO_GROUP"""
+        members.clear()
+        time.sleep(10)
+        members = scrape_data_info_list_txt(driver=driver,list_data = members, selector=app_web.DISPLAY_INFO_GROUP,selector_item=app_web.TXT_INFO_MEMBER, timeout=data["time_wll"])
+        
+    else:
+        members.clear()
+
+        """Buscaremos y daremo click a app_web@BTN_SEE_ALL_MEMBERS"""
+        if not click_see_all_members(driver=driver,data=data,selector=app_web.BTN_SEE_ALL_MEMBERS):
+            print("Problemas en click see all members @findmembers")
+            return
+
+        """"""
+        
+        container_member:WebElement = scrape_element(driver=driver,selector=app_web.CONTAINER_LIST_MEMBERS, timeout=data["time_wll"])
+
+        if not container_member:
+            return
+        #iniciando observer/reconectando
+        driver.execute_script("window.flagListMember(arguments[0]);",container_member)
+        # Forzar el primer cambio
+        if not driver.execute_script("return window.listMemberResponse;"): #se supone que sea false, para oblgarl aentra en el bucle, sino es true no se hace nada
+            driver.execute_script("window.listMemberResponse = true;")
+
+        #scrolling
+        while not stop_while:
+            if driver.execute_script("return window.listMemberResponse;"):
+                print("Hubo un cambio")
+
+                """Captacion de datos"""
+                items = scrape_elements(driver=container_member,selector=app_web.LISTITEM,timeout=data["time_wll"])
+
+                if not items:
+                    break
+                
+                for i in items:
+                    id_or_name = scrape_element(driver=i,selector=app_web.LISTITEM_NAME_OR_ID,timeout=data["time_wll"])
+                    if not id_or_name:
+                        continue
+                    data_set.add(id_or_name.text)
+
+                element_location = container_member.location
+                element_x, element_y = element_location['x'], element_location['y']
+
+                # Calcular las coordenadas absolutas en la pantalla
+                absolute_x = element_x *0.37
+                absolute_y = element_y * estadistica_pos
+
+                driver.execute_script("window.listMemberResponse = false;")
+                """scrolling o movimiento"""
+
+                pyautogui.moveTo(absolute_x, absolute_y)
+
+                pyautogui.scroll(scroll_prox)
+
+                time.sleep(3)
+            else:
+                stop_while = True
+        #desconctando observer
+        driver.execute_script("window.desconectarObserverListMember();")
+
+    members = list(data_set)
+    admins = get_admins(admins=admins,driver=driver,data=data, app_web=app_web)
+    
+    return (members,admins)
+
 @handle_exceptions
 def restringe_chat(driver:webdriver.Chrome,data:dict, app_web:WhatssappWebLabels)->bool:
     click_open_info_group(driver=driver,data=data,selector=app_web.BTN_INFO_GROUP)
@@ -245,10 +330,16 @@ def ban_member(driver:webdriver.Chrome,id_member : str,data : dict, app_web : Wh
         print("Advertencia: No se pudo mover el puntero al elemento ")
         return
                 
-    if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DISPLAY_MENU_MEMBERS_1, timeout=data["time_wll"]):
-        print("Advertencia: No se pudo abrir el menú de opciones. Terminando...")
-        return
-            
+    # if not wait_element_to_be_clickable(driver=element, selector=app_web.BTN_TO_DISPLAY_MENU_MEMBERS_1, timeout=data["time_wll"]):
+    #     print("Advertencia: No se pudo abrir el menú de opciones. Terminando...")
+    #     if not wait_element_to_be_clickable(driver=element, selector=app_web.BTN_TO_DISPLAY_MENU_MENSSAGE, timeout=data["time_wll"]):
+    #         print("Advertencia: No se pudo abrir el menú de opciones.251")
+    #         if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DISPLAY_MENU_MEMBERS_1, timeout=data["time_wll"]):
+    #             print("Advertencia: No se pudo abrir el menú de opciones. 253...")
+    #             if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DISPLAY_MENU_MENSSAGE, timeout=data["time_wll"]):
+    #                 print("Advertencia: No se pudo abrir el menú de opciones. Terminando...255")
+
+    element.click()
         
     menu = scrape_element(driver=driver, selector=app_web.CONTAINER_MENU_OPTION_MESSAGE, timeout=data["time_wll"])
     if not menu:
@@ -266,7 +357,7 @@ def ban_member(driver:webdriver.Chrome,id_member : str,data : dict, app_web : Wh
                 
             if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DELETE, timeout=data["time_wll"]):
                 print("Advertencia: No se pudo confirmar la primera ventana modal.")
-                return
+                break
                 
                 
             if not wait_element_to_be_clickable(driver=driver,selector=app_web.BTN_TO_OK,timeout=data["time_wll"]):
@@ -330,7 +421,7 @@ def promove_member(driver:webdriver.Chrome,id_member : str,data : dict, app_web 
 
     if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DISPLAY_MENU_MEMBERS_1, timeout=data["time_wll"]):
         print("Advertencia: No se pudo abrir el menú de opciones. Terminando...")
-        return
+        element.click()
 
     menu = scrape_element(driver=driver, selector=app_web.CONTAINER_MENU_OPTION_MESSAGE, timeout=data["time_wll"])
     if not menu:
@@ -409,7 +500,7 @@ def depromove_member(driver:webdriver.Chrome,id_member : str,data : dict, app_we
 
     if not wait_element_to_be_clickable(driver=driver, selector=app_web.BTN_TO_DISPLAY_MENU_MEMBERS_1, timeout=data["time_wll"]):
         print("Advertencia: No se pudo abrir el menú de opciones. Terminando...")
-        return
+        element.click()
 
     menu = scrape_element(driver=driver, selector=app_web.CONTAINER_MENU_OPTION_MESSAGE, timeout=data["time_wll"])
     if not menu:
@@ -467,7 +558,7 @@ def send_mp3(driver:webdriver.Chrome,path : str,data : dict, app_web : Whatssapp
         edit_on_input(element=input_search, value="ENTER")
         return
         
-    print(type(path))
+    # print(type(path))
     # partes = path.split("\\")
     # if partes:
     #     edit_on_input(element=input_search, value=f"Ya tenemos tu archivo mp3 y ya ha sido enviado con exito uwu : {partes[-1]}")

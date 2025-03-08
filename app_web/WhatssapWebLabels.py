@@ -82,6 +82,10 @@ class WhatssappWebLabels:
     CONTAINER_TARGET_SOLICITUDES = "//div[@class='x1n2onr6 x1c4vz4f x2lah0s xdl72j9 x13x2ugz xat24cr']"
     TARGET_SOLICITUD = ".//div[@class='x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x1nhvcw1 xdt5ytf x1cy8zhl']"
     SEE_DIALOG_BTN = "//div[@role='dialog'].//button[.//span[contains(text(),'Revisa')]]"
+    LISTITEM = ".//div[@role='listitem']"
+    LISTITEM_NAME_OR_ID = ".//div[@class='_ak8q']"
+    #class="_ak8q" name o id
+    #class="_ak8i" rango
 
     #class name
     CLASSNAME_AHKM = "_ahkm"

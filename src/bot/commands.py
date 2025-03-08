@@ -3,9 +3,8 @@ from app_web.WhatssapWebLabels import WhatssappWebLabels
 from download import Download
 from src.data.data_json import DataJson
 from move_to_downloas_stciker import move_recent_whatsapp_image
-from src.bot.actions import edit_on_input,restringe_chat,ban_member, promove_member, depromove_member,send_mp3,close_session,create_sticker, find_members,reset_link_invitation
+from src.bot.actions import edit_on_input,restringe_chat,ban_member, promove_member, depromove_member,send_mp3,close_session,create_sticker, find_members,reset_link_invitation,get_member
 from src.bot.scraper import scrape_element
-from src.bot.decorators import with_pause_handling
 from src.bot.utils import get_datetime_to_three_days,get_datetime
 from src.bot.scripts import to_script_to_reinciar_observer,to_return_ver_chat
 from pathlib import Path
@@ -13,14 +12,15 @@ import time
 import re
 import os
 import glob
-import threading
 import pyperclip
 import pyautogui
+import threading
+
 
 
 
 class Commands:
-    def __init__(self,driver:webdriver.Chrome, data:dict, app_web:WhatssappWebLabels,dict_country_codes : dict, download: Download, data_json:DataJson,pause_events : threading.Event,stop_events :threading.Event):
+    def __init__(self,driver:webdriver.Chrome, data:dict, app_web:WhatssappWebLabels,dict_country_codes : dict, download: Download, data_json:DataJson,stop_events:threading.Event):
         self.driver = driver
         self.data = data
         self.app_web = app_web
@@ -28,16 +28,14 @@ class Commands:
         self.telefono_regex = r"^\+?\d{1,4}?[\s-]?\(?\d{1,4}?\)?[\s-]?\d{1,4}[\s-]?\d{1,4}$"
         self.download_instance = download #class para descargar musica
         self.json = data_json
-        self.pause_events = pause_events
         self.stop_events = stop_events
         
-    @with_pause_handling("pause_events")
     def bye(self,*arg):
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         edit_on_input(element=input_box, value="Gracias chicos!!!, Bueno hasta pronto ;)")
         edit_on_input(element=input_box, value="ENTER")
+
         close_session(driver=self.driver,data=self.data,app_web=self.app_web)
-        time.sleep(5)
         self.stop_events.set()
 
     def __innable(self):
@@ -46,7 +44,6 @@ class Commands:
         edit_on_input(element=input_box, value="ENTER")
         time.sleep(5)
 
-    @with_pause_handling("pause_events")
     def menu(self,*arg):
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         pyperclip.copy(
@@ -100,8 +97,10 @@ class Commands:
     def salute(self)->str:
         return f"Hola gente del grupo de {self.data["group_name"]}, En unos minutos estare disponibles, etsoy cargando los miembros uwu"
     
-    @with_pause_handling("pause_events")
     def all(self,*args)->None:
+        asunto = None
+        if args:
+            asunto = args[0]
 
         # self.__innable()
         members = self.json.get_members(label="members")
@@ -112,29 +111,21 @@ class Commands:
             members_set = set(members)
             members_set -= {"Tú", None}
 
-            edit_on_input(element=input_box, value="Dependiendo de la cantidad de miembros, esto puede tardar entre 3 - 5 minutos :)...")
-            edit_on_input(element=input_box, value="ENTER")
+            edit_on_input(element=input_box, value=f"Asunto : {asunto}" if asunto else f"Chicos de {self.data["group_name"]},vengan: ")
+            edit_on_input(element=input_box, value=("SHIFT","ENTER"))
             
-            
-            for member in members_set:
+            for push,_ in enumerate(members_set):
+                edit_on_input(element=input_box, value="@")
+                """Confirmamos que eixtsan CONTACTOS"""
                 
-                #mejorar el formateado del value, oara captar todos
-                member_value = f"@{member[:-3]}"
-                if "\u202f" in member_value:
-                    value = member_value.replace("\u202f"," ")
-                else:
-                    value = member_value
-                edit_on_input(element=input_box, value=value)
+                """Secuencia de etiquetado"""
+                if push > 0:
+                    edit_on_input(element=input_box, value="ARROW_DOWN",batch_input=push)
+                    time.sleep(0.2)
+
                 edit_on_input(element=input_box, value="TAB")
 
-                # if re.match(self.telefono_regex, member[:-3]):
-                #      rango = len(member_value)
-                #      for _ in range(rango): #error whweb cuando eliminas se elimina la etiqueta (rango+1)       
-                #          edit_on_input(element=input_box, value="BACKSPACE")
-                
                 edit_on_input(element=input_box, value=("SHIFT","ENTER"))
-
-                
 
             edit_on_input(element=input_box, value="ENTER")
 
@@ -144,7 +135,6 @@ class Commands:
         edit_on_input(element=input_box, value="Finalizamos la funcion de etiquetar todos :)")
         edit_on_input(element=input_box, value="ENTER")
 
-    @with_pause_handling("pause_events")
     def admins(self,*args)->None:
         # self.__innable()
         members = self.json.get_members(label="admins")
@@ -184,7 +174,6 @@ class Commands:
         else: 
             raise print("Error la lista de miembros esta vacia :(")
 
-    @with_pause_handling("pause_events")
     def ban(self,*args)->None:
         members = self.json.get_members(label="members")
         member_ :str = None
@@ -212,7 +201,6 @@ class Commands:
             print(f"Varios valores: {args}")
             self.__innable()
 
-    @with_pause_handling("pause_events")
     def promove(self,*args)->None:
         
         members = self.json.get_members(label="members")
@@ -236,7 +224,6 @@ class Commands:
         else:
             self.__innable()
 
-    @with_pause_handling("pause_events")
     def despromove(self,*args)->None:
         members = self.json.get_members(label="admins")
         member_ :str = None
@@ -259,7 +246,6 @@ class Commands:
         else:
             self.__innable()
 
-    @with_pause_handling("pause_events")
     def shh(self,*args)->bool:
         """
             Si check = true (chat habilidado)
@@ -282,7 +268,6 @@ class Commands:
 
         return True if not restringe_chat(driver=self.driver,data=self.data, app_web=self.app_web) else False
         
-    @with_pause_handling("pause_events")
     def audio(self,*args)->None:
         if len(args) == 1:  # Si solo hay un argumento
             url = args[0]
@@ -334,15 +319,12 @@ class Commands:
             edit_on_input(element=input_box, value="Ya esta su audio listo :), disfrutelo uwu")
             edit_on_input(element=input_box, value="ENTER")
 
-    @with_pause_handling("pause_events")
     def upmembers(self,*args)->None:
-        
-        members, admins = find_members(dict_country_code=self.dict_country_code, driver=self.driver,data=self.data, app_web=self.app_web)
-
+        # members, admins = find_members(dict_country_code=self.dict_country_code, driver=self.driver,data=self.data, app_web=self.app_web)
+        members, admins = get_member(data=self.data, app_web=self.app_web, driver=self.driver)
         self.json.add_multiples(members=members,label="members")
         self.json.add_multiples(members=admins,label="admins")
     
-    @with_pause_handling("pause_events")
     def sticker(self,*args)->None:
 
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
@@ -376,7 +358,6 @@ class Commands:
         edit_on_input(element=input_box, value="Tu stciker ya esta hecho uwu, disfrutalo ")
         edit_on_input(element=input_box, value="ENTER")
 
-    @with_pause_handling("pause_events")
     def r_link(self,*args)->None:
         days = None
         if len(args) == 1:  # Si solo hay un argumento
@@ -404,7 +385,6 @@ class Commands:
                 edit_on_input(element=input_box, value="ENTER")
                 
 
-    @with_pause_handling("pause_events")
     def enlace(self,*args)->None:
     
         res = self.json.get_link()

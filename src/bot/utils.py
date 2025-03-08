@@ -152,3 +152,7 @@ def get_datetime():
 def get_datetime_to_three_days(date:datetime,days = 3):
     return (date + timedelta(days=days)).date()
 
+def es_numero_telefono(numero):
+    """Limpia el número y verifica si es un teléfono válido."""
+    numero_limpio = re.sub(r"\D", "", numero)  # Elimina todo lo que no sea un dígito
+    return bool(re.fullmatch(r"\d{10,15}", numero_limpio))

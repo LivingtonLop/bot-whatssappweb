@@ -139,7 +139,56 @@ to_script_to_reinciar_observer = """
 
 """
 
-to_get_data_footer_contactos = """
+to_get_member = """
+window.isObserverActive = false;
+window.observerListMember = null;
+window.listMemberResponse = false;
 
+window.initObserverListMember = function (listMember) {
+    if (!window.isObserverActive && listMember) {
+        window.observerListMember = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                    window.listMemberResponse = true;
+                }
+            });
+        });
+
+        const config = { childList: true, subtree: true, characterData: true };
+        window.observerListMember.observe(listMember, config);
+        window.isObserverActive = true;
+        console.log("Observador iniciado");
+    } else {
+        if (listMember){
+            window.reconectarObserverListMember(listMember)    
+        }
+    }
+};
+
+window.desconectarObserverListMember = function () {
+    if (window.observerListMember) {
+        window.observerListMember.disconnect();
+        window.isObserverActive = false;
+        console.log("Observador desconectado");
+    }
+};
+
+window.reconectarObserverListMember = function (listMember) {
+    if (window.observerListMember && listMember) {
+        const config = { childList: true, subtree: true, characterData: true };
+        window.observerListMember.observe(listMember, config);
+        console.log("Observador reconectado");
+    } else {
+        console.log("No hay observador activo o listMember no proporcionado");
+    }
+};
+
+window.flagListMember = function (listMember) {
+    if (!window.isObserverActive) {
+        window.initObserverListMember(listMember);
+    } else {
+        console.log("Si hay observador activo");
+    }
+};
 
 """

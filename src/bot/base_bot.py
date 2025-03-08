@@ -1,14 +1,14 @@
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import StaleElementReferenceException,WebDriverException,JavascriptException
-from src.bot.actions import perform_login, open_group,edit_on_input,restringe_chat,delete_message_chat, ban_member,approve_or_reject_user,close_session,download_image,get_size_listmember,read_chat_group
+from src.bot.actions import perform_login, open_group,edit_on_input,delete_message_chat, approve_or_reject_user,close_session,download_image,get_size_listmember,read_chat_group
 from src.bot.scraper import scrape_element
 from app_web.WhatssapWebLabels import WhatssappWebLabels
 from download import Download
 from src.data.data_json import DataJson
 from src.bot.commands import Commands
-from src.bot.utils import remove_emotes,get_author_in_data_id,get_type_in_target_message,normalize_number,find_number_position,get_datetime
-from src.bot.scripts import to_ver_chat_masive,to_return_ver_chat, to_ver_chat, to_return_node
+from src.bot.utils import remove_emotes,get_author_in_data_id,get_type_in_target_message,normalize_number,find_number_position,get_datetime,es_numero_telefono
+from src.bot.scripts import to_ver_chat_masive,to_return_ver_chat, to_ver_chat, to_return_node,to_get_member
 import re
 import time
 import threading
@@ -27,7 +27,7 @@ class Bot:
         self.pause_events = threading.Event() 
         self.pause_events.set() 
         # self.count_pause = 0
-        self.commands = Commands(driver = self.driver, data=data,app_web=app_web, dict_country_codes=dict_country_codes, download=download,data_json= self.json,pause_events = self.pause_events,stop_events = self.stop_events)
+        self.commands = Commands(driver = self.driver, data=data,app_web=app_web, dict_country_codes=dict_country_codes, download=download,data_json= self.json, stop_events = self.stop_events)
         self.lock = threading.Lock()# Evita accesos concurrentes
         self.executed_commands : dict[str,set[tuple[str,str]]] = dict()
         self.restringe_chat = False
@@ -55,7 +55,6 @@ class Bot:
             
             self.driver.execute_script(to_ver_chat_masive, self.app_web.CONTAINER_CHAT,self.app_web.QUERY_SELECTOR_MULTIMEDIA,3000,10)
             self.driver.execute_script(to_ver_chat, self.app_web.CONTAINER_CHAT)
-
             while not self.stop_events.is_set():
 
                 self.pause_events.wait()
@@ -101,36 +100,22 @@ class Bot:
             input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
             edit_on_input(element=input_text, value="Mucho spam de Stickers/Imagenes/Videos/Audio/Mensajes repeteido/Gifs/Roleo :)")
             edit_on_input(element=input_text, value="ENTER")
-                
-    # def detector_chat_pause(self):
-    #     input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
-    #     if self.count_pause == 300: #si pasa de los 5 minutos, el bot descansa
-
-    #         self.caso_chat_restringe(value=False)         
-    #         self.pause_events.clear()
-    #         tiempo = self.count_pause/60
-    #         edit_on_input(element=input_text, value=f"Inactividad del chat, me voy a mimir, esperen sus {tiempo} minutos :)")
-    #         edit_on_input(element=input_text, value="ENTER")
-
-    #         time.sleep(self.count_pause)
-    #         self.pause_events.set()
-
-    #         self.caso_chat_restringe(value=True)         
-    #         self.count_pause = 0
-    #         edit_on_input(element=input_text, value="Reanudamos actvidad del bot :)")
-    #         edit_on_input(element=input_text, value="ENTER")
 
     def init_run(self):
         perform_login(self.driver,self.data["url_app"])
             
         open_group(driver=self.driver, data=self.data, selector=self.app_web.BTN_CLICK_TO_OPEN_GROUP)
             
-        value = self.commands.salute()
-        input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
-        edit_on_input(element=input_text, value=value)
-        edit_on_input(element=input_text, value="ENTER")
+        # value = self.commands.salute()
+        # input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
+        # edit_on_input(element=input_text, value=value)
+        # edit_on_input(element=input_text, value="ENTER")
             
-        # self.actualizar_miembros()
+
+        """Inyectamos funciones en la ventana o window, para mas tarde usarlas"""
+        self.driver.execute_script(to_get_member)
+            
+        
         if not self.json.load():
             self.commands.upmembers()
 
@@ -185,12 +170,6 @@ class Bot:
 
                     if not self.verifique_ban_or_kick(message=message,target_message=target):
                         """Por que paso el filtro, o porque no es un mensaje/mensaje con imagen"""
-                        # print("No paso los filtros")
-
-
-                    # print("Nuevo Mensaje")
-
-                    # print(f"Finalizando tiempo : {self.test_time()}")
 
             except StaleElementReferenceException as e:
                 print(f"Error, problemas con message, posiblemente eliminado {e}")
@@ -204,7 +183,6 @@ class Bot:
         while not self.stop_events.is_set():
             
             self.pause_events.wait()
-            print("Revisando old messages")
             try:
                 _,messages = read_chat_group(driver=self.driver,data=self.data,selector=self.app_web.TXT_CHAT_GROUP)
 
@@ -226,8 +204,7 @@ class Bot:
                 print(f"Error, problemas con message, posiblemente eliminado {e}")
                 continue
             finally:
-                print("Finallizando (10segundo dormir)")
-                time.sleep(10)
+                time.sleep(30)
 
     def verifique_ban_or_kick(self, message : WebElement, target_message : WebElement)->bool:
         try:
@@ -279,13 +256,17 @@ class Bot:
 
         author,_,_,_ = self.get_data_message(target_message=target_message)
         if not self.restringe_chat:
-            restringe_chat(driver=self.driver,data=self.data, app_web=self.app_web)
+            self.commands.shh()
+            self.status_chat()
         
         delete_message_chat(driver=self.driver,message_del=message,data=self.data, app_web=self.app_web)
         if author:
-            ban_member(driver=self.driver, id_member=author,data=self.data,app_web=self.app_web,json=self.json)
+            self.commands.ban(author)
+
         if self.restringe_chat:
-            restringe_chat(driver=self.driver,data=self.data, app_web=self.app_web)
+            self.commands.shh("true")
+            self.status_chat()
+
         self.pause_events.set()
 
     def get_data_message(self, target_message:WebElement, t_data : bool = False)->tuple[str,str,str,str]:
@@ -468,10 +449,20 @@ class Bot:
                 self.pause_events.set()
 
             if hasattr(self.commands, is_command) and callable(getattr(self.commands, is_command)):
+                self.pause_events.clear()
+                #en prueba
+                if self.caso_argumento_etiquetador(target=target,arg=arg):
+                    print("Se encontro una etiqueta, es un argumento de un mimebro, se agrego sino existe True" )
+                else:
+                    print("False no se pudo")
+
                 metodo = getattr(self.commands, is_command)
                 metodo(*arg)
+
                 if command == "/shh":
                     self.status_chat()
+
+                self.pause_events.set()
                 # self.restringe_chat = res if res is not None else False
             else:
                 value = f"El comando '{is_command}' no existe. Usa /menu para ver los disponibles."
@@ -499,3 +490,37 @@ class Bot:
 
     def test_time(self):
         return time.time()
+    
+
+    def caso_argumento_etiquetador(self, target:WebElement, arg : list|str)->bool:
+        """Codifo en prueba"""
+        if target:
+            if arg:
+                data = arg
+                if isinstance(arg, list):
+                    data = arg[0]                
+                if not es_numero_telefono(numero=data):
+                    print("noe es numero")
+
+                    if self.json.find_member(data) == "not found":
+                        print("confirmamos")
+                        selector = f".//span[contains(text(), '{data}')]"
+                        etiqueta = scrape_element(driver=target,selector=selector,timeout=self.data["time_wll"])
+                        if etiqueta:
+                            print("si hay")
+                            id_etiqueta = etiqueta.get_attribute("data-app-text-template")
+                            if id_etiqueta:
+                                print("id")
+
+                                members = self.json.structure[self.data["group_name"]]["members"]
+                                normalized_members = [normalize_number(m) for m in members]
+                                pos = find_number_position(number=id_etiqueta,normalized_members=normalized_members)
+                                if pos > -1:
+                                    print("hubo coincidencia")
+                                    # existe el numero o etiqueta
+                                    if not self.json.add_member(data):
+                                        print("Caso de etiquetado, no fue enocntrado ni se pudo agregar, rveisar 496")
+                                    
+                                    return True
+        
+        return False
