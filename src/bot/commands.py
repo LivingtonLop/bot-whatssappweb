@@ -58,22 +58,22 @@ class Commands:
                 🖇️Administer/Accion grup🖇️ 
 
 
-                /all : Etiqueta a todos los miembros del grupo (excepto el bot) para su atención.
+                /all [asunto]: Etiqueta a todos los miembros del grupo (excepto el bot) para su atención, puedes indicar el asunto, por defecto sera "Chicos de {self.data["group_name"]},vengan:".
 
-                /ban [member] : Banea al usuario especificado del grupo.
+                /ban [member] : Banea al usuario especificado del grupo. (campo obligatorio)
 
                 /shh [true]: Restringe el chat del grupo (si ya está restringido, vuelve a ejecutar este comando, junto al true, para asi activar el detector de spam).
 
-                /promove [member]: Promueve al miembro como administrador del grupo.
+                /promove [member]: Promueve al miembro como administrador del grupo. (campo obligatorio)
 
-                /despromove [member] : Revoca los privilegios de administrador de un miembro.
+                /despromove [member] : Revoca los privilegios de administrador de un miembro. (campo obligatorio)
 
                 /r_link [days]: Restablecer/Resetear el enlace de invitacion del grupo, si pones los dias, seran los dias para hacerlo autamicamente, sinolopones conservara los dias, configurados anteriormente
 
                 /enlace : Manda el link de invitacion del grupo 
                 🪩Multimedia🪩 
 
-                /audio [link youtube]: Descarga y envía el audio desde YouTube en formato mp3 (máximo 16MB).
+                /audio [link youtube]: Descarga y envía el audio desde YouTube en formato mp3 (máximo 16MB). (campo obligatorio)
 
                 /sticker : Crea un sticker a partir de una imagen o archivo
 

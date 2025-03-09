@@ -18,19 +18,19 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 
 ### 🔧 Administración del Grupo
 
-- **/all** - 📢 Menciona a todos los miembros del grupo (excepto el bot).
+- **/all [asunto]** - 📢 Menciona a todos los miembros del grupo (excepto el bot), puedes indicar el asunto (campo no obligatorio).
 - **/upmembers** - 🔃 Actualiza la lista de usuarios/miembros del grupo.
-- **/ban [miembro]** - ⛔ Expulsa al usuario especificado del grupo.
-- **/shh [true]** - 🔇 Restringe el chat del grupo. Si ya está restringido, vuelve a ejecutarlo con `true` para activar el detector de spam.
-- **/promove [miembro]** - 🎖️ Promueve al usuario especificado a administrador del grupo.
-- **/despromove [miembro]** - ⏬ Revoca los privilegios de administrador de un miembro.
-- **/r\_link [días]** - 🔄 Restablece el enlace de invitación del grupo. Si se especifican días, se reseteará automáticamente en ese intervalo. Proporciona la fecha y el nuevo link.
-- **/enlace** -Trae el enlace de invitacion y lo imprime al grupo
+- **/ban [miembro]** - ⛔ Expulsa al usuario especificado del grupo (campo obligatorio).
+- **/shh [true]** - 🔇 Restringe el chat del grupo. Si ya está restringido, vuelve a ejecutarlo con `true` para activar el detector de spam (campo recomendable).
+- **/promove [miembro]** - 🎖️ Promueve al usuario especificado a administrador del grupo (campo obligatorio).
+- **/despromove [miembro]** - ⏬ Revoca los privilegios de administrador de un miembro (campo obligatorio).
+- **/r\_link [días]** - 🔄 Restablece el enlace de invitación del grupo. Si se especifican días, se reseteará automáticamente en ese intervalo. Proporciona la fecha y el nuevo link (campo recomendable).
+- **/enlace** -Trae el enlace de invitacion y lo imprime al grupo.
 ---
 
 ### 🎵 Multimedia
 
-- **/audio [enlace de YouTube]** - 🎶 Descarga y envía el audio del video de YouTube en formato MP3 (máximo 16MB).
+- **/audio [enlace de YouTube]** - 🎶 Descarga y envía el audio del video de YouTube en formato MP3 (máximo 16MB).(campo obligatorio).
 - **/sticker** - 🖼️ Convierte una imagen en un sticker de WhatsApp.
 
 ---
@@ -44,7 +44,7 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 ## ℹ️ Notas Adicionales
 
 - El bot solo funciona si está ejecutándose correctamente en la sesión de WhatsApp Web.
-- Algunos comandos pueden tardar unos segundos o minutos dependiendo del tamaño del grupo, o del rendimiento de tu computador, se recomienda siempre tener el navegador en pantalla, ya que usa teclas o librerias que simulan ser actividad humana (por solucionar).
+- Los campos que tardaban 3 a 5 minutos lo hemosreducido a que tarden como maximo 1:30 segundos, todo depende de tu maquina o internet.
 - El bot requiere permisos de administrador para ejecutar la mayoría de las funciones relacionadas con la gestión del grupo.
 
 📩 **Si tienes alguna duda o problema con el bot, consulta con el administrador del sistema.**
