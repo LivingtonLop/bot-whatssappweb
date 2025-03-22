@@ -73,7 +73,7 @@ class WhatssappWebLabels:
     CONTAINER_MENU_OPTION_MESSAGE = "//div[@class='_ak4w' and @role = 'application']" #_ak4w xacj9c0 xfh8nwu xoqspk4 x12v9rci x138vmkv
     CONTAINER_MENU_OPTION_SEND_FILE = "//div[@class='_ak4w xacj9c0 xfh8nwu xoqspk4 x12v9rci x138vmkv' and @role = 'application']"
     CONTAINER_INFO_GROUP_ALL = "//div[@class = 'x1n2onr6 xyw6214 x78zum5 x1r8uery x1iyjqo2 xdt5ytf x6ikm8r x1odjw0f x1hc1fzr']"
-
+    CONTAINER_ARIA_LABEL = "//div[contains(@class, 'focusable-list-item') and contains(@class, '_amjy') and contains(@class, '_amjw') and (contains(@class, 'message-in') or contains(@class, 'message-out'))]"
 
     CONTAINER_OPCIONES_MIEMBROS = "//div[@class = 'x1bnvlk4 x1n2onr6 x1c4vz4f x2lah0s xdl72j9 xyorhqc x13x2ugz']"
     MODAL_ROLE_DIALOG = "//div[@role='dialog']" #si existe mira sus btns y contenido de estos 
@@ -97,14 +97,19 @@ class WhatssappWebLabels:
 
     #atributes
     DATA_PRE_PLAIN_TEXT = "data-pre-plain-text"
+    DATA_PLAIN_TEXT_ETIQ = "data-plain-text" #la etiquetda
     # data-app-text-template   ---@c.us
     #data-jid ---@c.us
 
     # Expresión regular para capturar texto o número de teléfono + hora
     PATRON_HOUR = r"\b\d{1,2}:\d{2}\s?[APM]{2}\b" 
     PATRON_HORA_AUTOR = r"\[(\d{1,2}:\d{2}\s?[APM]{2}), .*?\] (.+?):"
+
+    PATRON_NUMERO_TELEFONO = r"^\+?(\d{1,4})?\s?(\(?\d{2,5}\)?[-.\s]?)?\d{4}[-.\s]?\d{4}$"
  
     PATRON_LINK_YOUTUBE =  r'(https?://)?(www\.)?((youtube\.com/watch\?v=|youtu\.be/)[\w-]+)'
+
+    PATRON_ARIA_LABEL = r'Quizá\s+([\w\W]+?)\s+(\+\d{2}\s\d{3}\s\d{6})'
 
     SIZE_LIMIT_AUDIO : float = 16.0
 

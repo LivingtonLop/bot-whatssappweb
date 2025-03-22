@@ -110,7 +110,6 @@ class Bot:
         # input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         # edit_on_input(element=input_text, value=value)
         # edit_on_input(element=input_text, value="ENTER")
-            
 
         """Inyectamos funciones en la ventana o window, para mas tarde usarlas"""
         self.driver.execute_script(to_get_member)
@@ -157,7 +156,6 @@ class Bot:
             try:
 
                 target : WebElement = self.driver.execute_script(to_return_node)
-
 
                 if target:
                     # print(f"Primer tiempo : {self.test_time()}")
@@ -354,13 +352,48 @@ class Bot:
                     author = self.json.structure[self.data["group_name"]]["members"][pos]
                 except (IndexError,TypeError):
                     data_target = None
-                        
+
+            if not author:
+                """Pasamos al caso de aria-label="Quizá 🌟 𝙳𝚊𝚗𝚗𝚢 🌟 +54 x xx xxx-xxxx  ?  11:54 a. m.
+                
+                hijo de _amjv _aotl
+
+                message-in focusable-list-item _amjy _amjw
+
+                aria-label
+                
+                """
+                is_aria_label = scrape_element(driver=target_message,selector=self.app_web.CONTAINER_ARIA_LABEL,timeout=self.data["time_wll"])
+
+                if not is_aria_label:
+                    print("No hay este container")
+                else:
+                    al = is_aria_label.get_attribute("aria-label")
+                    if al:
+                        # Expresión regular para capturar nombre y número
+                        match = re.search(self.app_web.PATRON_ARIA_LABEL, al)
+
+                        if match:
+                            nombre = match.group(1)  # Primer dato (nombre)
+                            numero = match.group(2)  # Segundo dato (número)
+
+                            print(f"Nombre: {nombre}")
+                            print(f"Número: {numero}")
+
+                            if not self.json.find_member(remove_emotes(nombre)) in ["not found","old","ban"]:
+                                author = remove_emotes(nombre)
+
+                            if not author:
+                                if not self.json.find_member(remove_emotes(numero)) in ["not found","old","ban"]:
+                                    author = remove_emotes(numero)
+
+                        else:
+                            print("No se encontraron coincidencias.")
+                
 
             if not type_:
                 #caso text
                 type_ = "text"
-
-            
 
             # print((author,data_id_target,type_,hour))
             return (author,data_id_target,type_,hour) 
@@ -385,7 +418,6 @@ class Bot:
 
                 print(f"Tamano actual : {size_now_member}")
                 print(f"Tamano antiguo : {size_member}")
-
 
                 # Si los tamaños no coinciden, actualizamos los miembros
                 if size_member != size_now_member:
@@ -450,13 +482,11 @@ class Bot:
 
             if hasattr(self.commands, is_command) and callable(getattr(self.commands, is_command)):
                 self.pause_events.clear()
-                #en prueba
-                if self.caso_argumento_etiquetador(target=target,arg=arg):
-                    print("Se encontro una etiqueta, es un argumento de un mimebro, se agrego sino existe True" )
-                else:
-                    print("False no se pudo")
+                
+                """Codigo en prueba 16/03/2025"""
+                self.caso_argumento_etiquetador(target=target)
+                metodo = getattr(self.commands, is_command)                
 
-                metodo = getattr(self.commands, is_command)
                 metodo(*arg)
 
                 if command == "/shh":
@@ -492,35 +522,21 @@ class Bot:
         return time.time()
     
 
-    def caso_argumento_etiquetador(self, target:WebElement, arg : list|str)->bool:
-        """Codifo en prueba"""
+    def caso_argumento_etiquetador(self, target:WebElement):
+        """Codigo en prueba 16/03/2025"""
         if target:
-            if arg:
-                data = arg
-                if isinstance(arg, list):
-                    data = arg[0]                
-                if not es_numero_telefono(numero=data):
-                    print("noe es numero")
+            
+            is_etiqueta = scrape_element(driver=target,selector=".//span[@role='button']",timeout=self.data["time_wll"])
 
-                    if self.json.find_member(data) == "not found":
-                        print("confirmamos")
-                        selector = f".//span[contains(text(), '{data}')]"
-                        etiqueta = scrape_element(driver=target,selector=selector,timeout=self.data["time_wll"])
-                        if etiqueta:
-                            print("si hay")
-                            id_etiqueta = etiqueta.get_attribute("data-app-text-template")
-                            if id_etiqueta:
-                                print("id")
+            if is_etiqueta:
 
-                                members = self.json.structure[self.data["group_name"]]["members"]
-                                normalized_members = [normalize_number(m) for m in members]
-                                pos = find_number_position(number=id_etiqueta,normalized_members=normalized_members)
-                                if pos > -1:
-                                    print("hubo coincidencia")
-                                    # existe el numero o etiqueta
-                                    if not self.json.add_member(data):
-                                        print("Caso de etiquetado, no fue enocntrado ni se pudo agregar, rveisar 496")
-                                    
-                                    return True
-        
-        return False
+                    is_auto = scrape_element(driver=is_etiqueta,selector=".//span[@dir='auto']",timeout=self.data["time_wll"])
+
+                    if is_auto:
+                        
+                        etiquetado = is_auto.get_attribute(self.app_web.DATA_PLAIN_TEXT_ETIQ)
+
+                        if etiquetado:            
+                        
+                            self.json.add_member(name=remove_emotes(etiquetado).lstrip("@"))
+                                

@@ -5,8 +5,9 @@ from src.data.data_json import DataJson
 from move_to_downloas_stciker import move_recent_whatsapp_image
 from src.bot.actions import edit_on_input,restringe_chat,ban_member, promove_member, depromove_member,send_mp3,close_session,create_sticker, find_members,reset_link_invitation,get_member
 from src.bot.scraper import scrape_element
-from src.bot.utils import get_datetime_to_three_days,get_datetime
+from src.bot.utils import get_datetime_to_three_days,get_datetime,remove_emotes
 from src.bot.scripts import to_script_to_reinciar_observer,to_return_ver_chat
+from src.bot.decorators import handle_exceptions
 from pathlib import Path
 import time
 import re
@@ -15,7 +16,7 @@ import glob
 import pyperclip
 import pyautogui
 import threading
-
+import json
 
 
 
@@ -30,6 +31,7 @@ class Commands:
         self.json = data_json
         self.stop_events = stop_events
         
+    @handle_exceptions
     def bye(self,*arg):
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         edit_on_input(element=input_box, value="Gracias chicos!!!, Bueno hasta pronto ;)")
@@ -37,13 +39,15 @@ class Commands:
 
         close_session(driver=self.driver,data=self.data,app_web=self.app_web)
         self.stop_events.set()
-
+    
+    @handle_exceptions
     def __innable(self):
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         edit_on_input(element=input_box, value="Funcion Inahilitada, por testing de otras funciones")
         edit_on_input(element=input_box, value="ENTER")
         time.sleep(5)
-
+    
+    @handle_exceptions
     def menu(self,*arg):
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
         pyperclip.copy(
@@ -93,10 +97,11 @@ class Commands:
         time.sleep(3)
         edit_on_input(element=input_box, value=("ENTER"))
 
-        
+    @handle_exceptions
     def salute(self)->str:
         return f"Hola gente del grupo de {self.data["group_name"]}, En unos minutos estare disponibles, etsoy cargando los miembros uwu"
     
+    @handle_exceptions
     def all(self,*args)->None:
         asunto = None
         if args:
@@ -135,6 +140,7 @@ class Commands:
         edit_on_input(element=input_box, value="Finalizamos la funcion de etiquetar todos :)")
         edit_on_input(element=input_box, value="ENTER")
 
+    @handle_exceptions
     def admins(self,*args)->None:
         # self.__innable()
         members = self.json.get_members(label="admins")
@@ -173,7 +179,8 @@ class Commands:
 
         else: 
             raise print("Error la lista de miembros esta vacia :(")
-
+    
+    @handle_exceptions
     def ban(self,*args)->None:
         members = self.json.get_members(label="members")
         member_ :str = None
@@ -181,18 +188,20 @@ class Commands:
         
         if len(args) == 1:  # Si solo hay un argumento
             
-            print(args[0])
 
             member_ = args[0]
-
             member = member_.lstrip("@").strip()
 
-            if  member in members:
-
+            patron = re.compile(self.app_web.PATRON_NUMERO_TELEFONO)
+            if not patron.match(member):
+                member_sin_emote = remove_emotes(member)
+                member = json.dumps(member_sin_emote, ensure_ascii=True)[1:-1]
+            
+            if member in members:
                 ban_member(driver=self.driver,id_member=member,data=self.data, app_web=self.app_web,json=self.json)
-        
+                
             else:
-                value = f"El argumento/miembro '{args[0]}' no existe. Use este comando mas tarde"
+                value = f"El argumento/miembro '@{member}' no existe. Use este comando mas tarde"
                 input_text = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
                 edit_on_input(element=input_text, value=value)
                 edit_on_input(element=input_text, value="ENTER")
@@ -201,6 +210,7 @@ class Commands:
             print(f"Varios valores: {args}")
             self.__innable()
 
+    @handle_exceptions
     def promove(self,*args)->None:
         
         members = self.json.get_members(label="members")
@@ -210,6 +220,11 @@ class Commands:
             member_ = args[0]
 
             member = member_.lstrip("@").strip()
+
+            patron = re.compile(self.app_web.PATRON_NUMERO_TELEFONO)
+            if not patron.match(member):
+                member_sin_emote = remove_emotes(member)
+                member = json.dumps(member_sin_emote, ensure_ascii=True)[1:-1]
 
             if  member in members:
                 
@@ -224,6 +239,7 @@ class Commands:
         else:
             self.__innable()
 
+    @handle_exceptions
     def despromove(self,*args)->None:
         members = self.json.get_members(label="admins")
         member_ :str = None
@@ -232,6 +248,11 @@ class Commands:
             member_ = args[0]
 
             member = member_.lstrip("@").strip()
+
+            patron = re.compile(self.app_web.PATRON_NUMERO_TELEFONO)
+            if not patron.match(member):
+                member_sin_emote = remove_emotes(member)
+                member = json.dumps(member_sin_emote, ensure_ascii=True)[1:-1]
 
             if  member in members:
 
@@ -246,6 +267,7 @@ class Commands:
         else:
             self.__innable()
 
+    @handle_exceptions
     def shh(self,*args)->bool:
         """
             Si check = true (chat habilidado)
@@ -267,7 +289,8 @@ class Commands:
                     self.driver.execute_script(to_script_to_reinciar_observer,self.app_web.CONTAINER_CHAT)
 
         return True if not restringe_chat(driver=self.driver,data=self.data, app_web=self.app_web) else False
-        
+
+    @handle_exceptions    
     def audio(self,*args)->None:
         if len(args) == 1:  # Si solo hay un argumento
             url = args[0]
@@ -319,12 +342,14 @@ class Commands:
             edit_on_input(element=input_box, value="Ya esta su audio listo :), disfrutelo uwu")
             edit_on_input(element=input_box, value="ENTER")
 
+    @handle_exceptions
     def upmembers(self,*args)->None:
         # members, admins = find_members(dict_country_code=self.dict_country_code, driver=self.driver,data=self.data, app_web=self.app_web)
         members, admins = get_member(data=self.data, app_web=self.app_web, driver=self.driver)
         self.json.add_multiples(members=members,label="members")
         self.json.add_multiples(members=admins,label="admins")
     
+    @handle_exceptions
     def sticker(self,*args)->None:
 
         input_box = scrape_element(driver=self.driver, selector=self.app_web.TXT_CHAT_GROUP, timeout=self.data["time_wll"])
@@ -358,6 +383,7 @@ class Commands:
         edit_on_input(element=input_box, value="Tu stciker ya esta hecho uwu, disfrutalo ")
         edit_on_input(element=input_box, value="ENTER")
 
+    @handle_exceptions
     def r_link(self,*args)->None:
         days = None
         if len(args) == 1:  # Si solo hay un argumento
@@ -384,7 +410,7 @@ class Commands:
                 edit_on_input(element=input_box, value=f"/admins Ha sido Reseteado el enlace")
                 edit_on_input(element=input_box, value="ENTER")
                 
-
+    @handle_exceptions
     def enlace(self,*args)->None:
     
         res = self.json.get_link()

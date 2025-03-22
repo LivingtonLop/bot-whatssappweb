@@ -1,11 +1,11 @@
 to_ver_chat = """
 
-var chatContainer = document.querySelector(arguments[0]);
+var chatContainerMessage = document.querySelector(arguments[0]);
 
-if (chatContainer){
+if (chatContainerMessage){
 
     window.message;
-    window.observer = new MutationObserver(function (mutations) {
+    window.observer_message = new MutationObserver(function (mutations) {
 
         for (var mutation of mutations) {
             mutation.addedNodes.forEach(node => {
@@ -26,7 +26,7 @@ if (chatContainer){
     
     });
 
-    observer.observe(chatContainer, { childList: true, subtree: true });    
+    observer_message.observe(chatContainerMessage, { childList: true, subtree: true });    
 
     console.log("🔹 Monitoreo de palabras...");
 

@@ -92,8 +92,7 @@ def is_element_still_valid(element: WebElement) -> bool:
         return False
 
 def remove_emotes(texto):
-    texto_sin_emojis = emoji.replace_emoji(texto, "")
-    return " ".join(texto_sin_emojis.split()) 
+    return emoji.replace_emoji(texto, replace="")
 
 def get_number(texto: str) -> int:
     numeros = re.findall(r'\d+', texto)  # Busca todos los números en el texto
