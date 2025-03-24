@@ -6,7 +6,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
-from app_web.WhatssapWebLabels import WhatssappWebLabels
+from app_web.WhatssapWebClass import WhatssappWebLabels
 
 # from src.exceptions import TimeoutError, RunError, ElementInteractionError, ScraperError
 from src.bot.utils import wait_element_to_be_clickable, wait_element_to_be_clickable,actionschains_move_to_element,remove_emotes,str_to_bool

@@ -1,7 +1,7 @@
 from src.bot.base_bot import Bot
 from app_web.config import data
 from diccionary_data import LIST_BLACK, LIST_GREY,COUNTRY_CODES,LIST_LINK_SPAM,COUNTRY_CODES_SPAM_OR_SCAM
-from app_web.WhatssapWebLabels import WhatssappWebLabels
+from app_web.WhatssapWebClass import WhatssappWebLabels
 from src.exceptions import BotError, RunError, ScraperError
 from src.error_logger import ErrorLogger
 from download import Download

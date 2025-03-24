@@ -3,7 +3,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.common.exceptions import StaleElementReferenceException,WebDriverException,JavascriptException
 from src.bot.actions import perform_login, open_group,edit_on_input,delete_message_chat, approve_or_reject_user,close_session,download_image,get_size_listmember,read_chat_group
 from src.bot.scraper import scrape_element
-from app_web.WhatssapWebLabels import WhatssappWebLabels
+from app_web.WhatssapWebClass import WhatssappWebLabels
 from download import Download
 from src.data.data_json import DataJson
 from src.bot.commands import Commands

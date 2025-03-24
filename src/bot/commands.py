@@ -1,5 +1,5 @@
 from selenium import webdriver
-from app_web.WhatssapWebLabels import WhatssappWebLabels
+from app_web.WhatssapWebClass import WhatssappWebLabels
 from download import Download
 from src.data.data_json import DataJson
 from move_to_downloas_stciker import move_recent_whatsapp_image
