@@ -21,7 +21,7 @@ TIME_WAIT_TO_LOAD_LABELS = 3 #seconds hasta que carga
 TIME_ACTION_DURACION = 2000 #miliseconds mantiene la seleccion
 
 #DOWNLOAD
-DOWNLOAD_STICKER = r"C:\Users\Livington Lopez\Documents\bot\downloads\sticker"
+DOWNLOAD_STICKER = r"C:\Users\[Your Account]\Documents\bot\downloads\sticker"
 DOWNLOAD_STICKER_RELATIVE = r"downloads\sticker"
 
 SPAM_THRESHOLD = 10
