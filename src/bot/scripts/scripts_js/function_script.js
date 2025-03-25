@@ -1,5 +1,3 @@
-to_ver_chat = """
-
 var chatContainer = document.querySelector(arguments[0]);
 
 if (chatContainer){
@@ -38,10 +36,6 @@ if (chatContainer){
 
 
 
-"""
-
-
-to_ver_chat_masive = """
 var chatContainer = document.querySelector(arguments[0]);
 
 if (chatContainer) {
@@ -110,15 +104,13 @@ if (chatContainer) {
 } else {
     console.log("⚠️ No se encontró el contenedor del chat.");
 }
-"""
 
 
-to_return_ver_chat = """
-return window.spamDetected;
 
-"""
+// return window.spamDetected;
 
-to_return_node ="""
+
+
 function obtenerYVaciarMensaje() {
     let message = window.message; // Guarda la referencia al nodo
     window.message = null; // Borra la referencia en window
@@ -126,20 +118,16 @@ function obtenerYVaciarMensaje() {
     return message; // Devuelve el nodo
 }
 
-return obtenerYVaciarMensaje();
+// return obtenerYVaciarMensaje();
 
-"""
-
-to_script_to_reinciar_observer = """
 
     console.log("🔄 Reiniciando el observer...");
     window.spamDetected = false;
 
     window.observer.observe(document.querySelector(arguments[0]), {childList: true, subtree: true});
 
-"""
 
-to_get_member = """
+
 window.isObserverActive = false;
 window.observerListMember = null;
 window.listMemberResponse = false;
@@ -191,4 +179,3 @@ window.flagListMember = function (listMember) {
     }
 };
 
-"""
