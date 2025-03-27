@@ -1,5 +1,3 @@
-from src.bot.decorators import handle_exceptions_list
-
 class WhatsAppWebClass:
     """
     Class to interact with WhatsApp Web on Windows 10 using ChromeDriver.
@@ -135,24 +133,98 @@ class WhatsAppWebClass:
             "max_video_size_mb": 16,
             "max_audio_size_mb": 16
         }
-
-    @handle_exceptions_list
+    
     def get_xpath(self,category: str,key: str) -> str|bool:
         """
         Returns the XPath from a specific category.
 
         Parameters:
-            category (str): The category name ("buttons", "containers", "attributes").
+            category (str): The category name ("buttons", "containers", "attributes", "limits").
             key (str): The button name (e.g., "open_group").
 
         Returns:
             str: The XPath string.
             bool: False if the XPath is not found.
+
+        Buttons:
+            • open_group •
+            • open_info_group •
+            • see_all_members •
+            • see_old_members •
+            • close •
+            • close2 •
+            • back •
+            • confirm •
+            • aprovee •
+            • deneger •
+            • group_permission •
+            • delete •
+            • delete2 •
+            • delete_all •
+            • menu_contextual •
+            • menu_contextual_member •
+            • send_file •
+            • add_file •
+            • download_file •
+            • settings •
+            • confirm_close_session •
+            • close_session •
+            • link_invited •
+            • confirm_reset_link •
+            • reset_link_invited •
+            • copy_link_invited •
+            • asign_admin •
+            • solicitud_pendientes •
+            • see_solicutud •
+
+        Containers:
+            • chat •
+            • info_group •
+            • info_group_all •
+            • display_info_group •
+            • list_member •
+            • message_group •
+            • config_group •
+            • text_chat •
+            • text_info_member •
+            • p_search •
+            • opciones_mimebors_children •
+            • target_mensaje •
+            • target_info_member •
+            • copyable_text_arg •
+            • tag_member_to_command •
+            • input_config_chat •
+            • child_input_config_chat •
+            • check_input •
+            • menu_opciones_message •
+            • menu_option_file •
+            • option_member •
+            • modal_dialog •
+            • solicitud_pendientes •
+            • target_solictudes_pendientes •
+            • target_solicitud •
+            • listitem •
+            • listitem2 •
+            • li •
+            • sticker •
+            • img •
+            • video •
+            • gif •
+            • voice_record •
+
+        Attributes:
+            • "ahkm" •
+            • "data_pre_plain_text" •
+        
+        Limites:
+            • "max_video_size_mb" •
+            • "max_audio_size_mb" •
         """
         categories = {
             "buttons": self.buttons,
             "containers": self.containers,
-            "attributes": self.attributes
+            "attributes": self.attributes,
+            "limites":self.limits
         }
 
         return categories.get(category, {}).get(key, False)

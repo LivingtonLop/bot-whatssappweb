@@ -1,50 +1,57 @@
-from src.exceptions import RunError, TimeoutError, ElementInteractionError
+from src.exceptions import RunError
 from src.error_logger import ErrorLogger
 import functools
-
+from typing import Any, Callable, Type
 
 logger = ErrorLogger()
 
-def handle_exceptions(func):
-    """Decorador para manejar excepciones de manera uniforme en funciones del bot."""
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        
-        except TimeoutError as e:
-            error = RunError(f"⏳ Timeout en {func.__name__}", url=kwargs.get("url"))
-            logger.log(error)
-            # raise error
-        
-        except ElementInteractionError as e:
-            error = RunError(f"🖱️ Fallo de interacción en {func.__name__}", url=kwargs.get("url"))
-            logger.log(error)
-            # raise error
+def handle_exceptions(*exception_types: Type[Exception]):
+    """Decorador genérico para manejar excepciones de forma uniforme en el bot."""
+    def decorator(func: Callable) -> Callable:
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> Any | bool:
+            try:
+                return func(*args, **kwargs)
+            
+            except exception_types as e:
+                error_msg = f"⚠️ {type(e).__name__} en {func.__name__}: {e}"
+                logger.log(RunError(error_msg, url=kwargs.get("url")))
+                return False  # No interrumpe el programa
 
-        except Exception as e:
-            error = RunError(f"❌ Error inesperado en {func.__name__}: {e}", url=kwargs.get("url"))
-            logger.log(error)
-            # raise error
+            except Exception as e:
+                error_msg = f"❌ Error inesperado en {func.__name__}: {e}"
+                logger.log(RunError(error_msg, url=kwargs.get("url")))
+                return False  # No interrumpe el programa
 
-    return wrapper
+        return wrapper
+    return decorator
 
-def handle_exceptions_list(func):
-    "Decorator to case list"
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
+# Decoradores específicos basados en el decorador genérico
 
-        except (KeyError, IndexError) as e:
-            error = RunError(f"Error in function '{func.__name__}': {e}")
-            logger.log(error)
-            return False
+# handle_exceptions_bot = handle_exceptions(
+#     TimeoutError, 
+#     ElementInteractionError, 
+#     NoSuchElementException, 
+#     StaleElementReferenceException, 
+#     WebDriverException,
+#     MoveTargetOutOfBoundsException,
+#     ElementNotInteractableException,
+#     InvalidElementStateException,
+# )
 
-        except Exception as e:
-            error = RunError(f"❌ Error inesperado en {func.__name__}: {e}", url=kwargs.get("url"))
-            logger.log(error)
-            return False
-            # raise error
+# handle_exceptions_list = handle_exceptions(
+#     KeyError, 
+#     IndexError, 
+#     TypeError, 
+#     ValueError
+# )
 
-    return wrapper
+# handle_exceptions_utils = handle_exceptions(
+#     TimeoutException, 
+#     TimeoutError, 
+#     FileNotFoundError, 
+#     PermissionError, 
+#     OSError, 
+#     JSONDecodeError
+    
+# )

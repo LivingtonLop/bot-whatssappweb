@@ -7,7 +7,7 @@ from pathlib import Path
 # =======================
 GROUP_NAME = "Artistas [ 2025 ]"
 APP_WEB = "https://web.whatsapp.com"
-
+BOT_ID="Tu nickname"
 # =======================
 # 📌 OPCIONES DE CHROME
 # =======================
