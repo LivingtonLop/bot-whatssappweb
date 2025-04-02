@@ -35,7 +35,7 @@ WAIT_TIMES = {
 # =======================
 # 📌 DESCARGAS
 # =======================
-BASE_DIR = Path(os.getenv("BOT_BASE_DIR", "C:/Users/[Your account]/Documents/bot"))
+BASE_DIR = Path(__file__).resolve()
 DOWNLOAD_DIR = BASE_DIR / "downloads" / "sticker"
 
 # =======================

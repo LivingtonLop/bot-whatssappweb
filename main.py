@@ -18,3 +18,4 @@ except Exception as e:
 
 finally:
     print("✅ Ejecución del bot finalizada.")
+    bot.driver.quit()

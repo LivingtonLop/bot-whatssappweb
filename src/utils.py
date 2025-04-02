@@ -32,7 +32,7 @@ class Utils:
         :param by: El tipo de búsqueda (por defecto es By.XPATH).
         :param timeout: Tiempo de espera en segundos (por defecto es 10 segundos).
         
-        :return: True si el elemento fue presenciado, de lo contrario False.
+        :return: True si el elemento fue presenciado (WebElement), de lo contrario False.
         """
         element = WebDriverWait(driver=self.driver,timeout=timeout).until(
             EC.presence_of_element_located((by,selector))
@@ -52,16 +52,16 @@ class Utils:
         :return: True si los elementos fue presenciados, de lo contrario False.
         """
 
-        element = WebDriverWait(driver=self.driver,timeout=timeout).until(
+        elements = WebDriverWait(driver=self.driver,timeout=timeout).until(
             EC.presence_of_all_elements_located((by,selector))
         )
 
-        return element
+        return elements
 
     @handle_exceptions(TimeoutException,NoSuchElementException,ElementNotInteractableException,WebDriverException) 
     def wait_to_element_to_be_clickable(self, selector:str,by = By.XPATH, timeout=10)->bool:
         """
-        Espera a que un elemento sea clickeable en el WebDriver
+        Espera a que un elemento sea clickeable en el WebDriver (Dara click)
 
         :param selector: El selector que se utiliza para encontrar el elemento.
         :param by: El tipo de búsqueda (por defecto es By.XPATH).
@@ -92,3 +92,18 @@ class Utils:
         action.move_to_element(to_element=element).perform()
         return True
         
+    def strtoBool(self, string: str) -> bool:
+        """
+        Convierte una cadena en un valor booleano.
+
+        :param string: String a convertir a Bool.
+        :return: True si la cadena representa un valor verdadero, False si representa uno falso.
+        :si existe un problema o error por defecto es False
+        """
+        valores = {"True": True,"true": True, "1": True,"False": False, "false": False, "0": False}
+
+        string = string.strip().lower()  # Eliminamos espacios y convertimos a minúsculas
+        if string in valores:
+            return valores[string]
+        
+        return False

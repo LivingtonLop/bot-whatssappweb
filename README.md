@@ -18,10 +18,10 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 
 ### 🔧 Administración del Grupo
 
-- **/all [asunto]** - 📢 Menciona a todos los miembros del grupo (excepto el bot), puedes indicar el asunto (campo no obligatorio).
+- **/all ["asunto"]** - 📢 Menciona a todos los miembros del grupo (excepto el bot), puedes indicar el asunto (campo no obligatorio).
 - **/upmembers** - 🔃 Actualiza la lista de usuarios/miembros del grupo.
 - **/ban [miembro]** - ⛔ Expulsa al usuario especificado del grupo (campo obligatorio).
-- **/shh [true]** - 🔇 Restringe el chat del grupo. Si ya está restringido, vuelve a ejecutarlo con `true` para activar el detector de spam (campo recomendable).
+- **/shh** - 🔇 Restringe el chat del grupo. Si ya está restringido, vuelve a ejecutarlo.
 - **/promove [miembro]** - 🎖️ Promueve al usuario especificado a administrador del grupo (campo obligatorio).
 - **/despromove [miembro]** - ⏬ Revoca los privilegios de administrador de un miembro (campo obligatorio).
 - **/r\_link [días]** - 🔄 Restablece el enlace de invitación del grupo. Si se especifican días, se reseteará automáticamente en ese intervalo. Proporciona la fecha y el nuevo link (campo recomendable).

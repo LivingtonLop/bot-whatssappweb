@@ -1,3 +1,6 @@
+from selenium.webdriver.remote.webelement import WebElement
+from src.utils import Utils
+
 class WhatsAppWebClass:
     """
     Class to interact with WhatsApp Web on Windows 10 using ChromeDriver.
@@ -21,8 +24,9 @@ class WhatsAppWebClass:
     PATRON_HORA_AUTOR = r"\[(\d{1,2}:\d{2}\s?[APM]{2}), .*?\] (.+?):"
     PATRON_LINK_YOUTUBE =  r'(https?://)?(www\.)?((youtube\.com/watch\?v=|youtu\.be/)[\w-]+)'
     QUERY_SELECTOR_MULTIMEDIA = "div[class = '_amk4 _amkt'], div[class = '_amk4 _amkv'], div[class = '_amk4 _amk9'], div[class = '_amk4 _amku']"
+    input_restringe_chat :bool = False #False no esta restringido
 
-    def __init__(self, bot_id: str = "000 00 0000 0000", group_name: str = "WhatsApp Group"):
+    def __init__(self,utils :Utils, bot_id: str = "000 00 0000 0000", group_name: str = "WhatsApp Group"):
         """
         Initializes an instance of WhatsAppWebClass.
 
@@ -32,6 +36,8 @@ class WhatsAppWebClass:
         """
         self._bot_id: str = bot_id
         self._group_name: str = group_name
+        self.utils =utils
+        
 
     @property
     def bot_id(self) -> str:
@@ -48,7 +54,7 @@ class WhatsAppWebClass:
         """Returns a dictionary of XPath buttons."""
         return {
             "open_group": f"//span[@title='{self._group_name}']",
-            "open_info_group": "//div[@title='Profile details' and @role='button']",
+            "open_info_group": "//div[(@title='Detalles del perfil' or @title='Profile details') and @role='button']",
             "see_all_members": "//div[contains(., 'Ver todos')]",
             "see_old_members":"//button[text()='Ver miembros anteriores']",
             "close":"//div[@aria-label='Cerrar' and @role='button']",
@@ -59,7 +65,7 @@ class WhatsAppWebClass:
             "deneger":"//div[@aria-label='Rechazar']",
             "group_permission":"//div[@role='button' and contains(@class, 'xkhd6sd') and .//div[contains(text(), 'Permisos del grupo')]]",
             "delete":"//button[@title='Eliminar']",
-            "delete2":".//button[.//div[contains(text(), 'Eliminar')]]",
+            "delete2":"//button[.//div[contains(text(), 'Eliminar')]]",
             "delete_all":"//button[.//div[contains(text(), 'Eliminar para todos')]]",
             "menu_contextual":"//div[@aria-label='Menú contextual']",
             "menu_contextual_member":"//button[@aria-label='Abrir el menú contextual del chat']",
@@ -73,7 +79,7 @@ class WhatsAppWebClass:
             "confirm_reset_link":"//button[.//div[contains(text(), 'Restablecer enlace')]]",
             "reset_link_invited":"//div[@title='Restablecer enlace' and @aria-label='Restablecer enlace']",
             "copy_link_invited":"//div[@title='Copiar enlace' and @aria-label='Copiar enlace']",
-            "asign_admin":".//button[.//div[contains(text(), 'Designar como admin. del grupo')]]",
+            "asign_admin":"//button[.//div[contains(text(), 'Designar como admin. del grupo')]]",
             "solicitud_pendientes":"//div[contains(text(),'Solicitudes pendientes')]",
             "see_solicutud":"//div[@role='dialog'].//button[.//span[contains(text(),'Revisa')]]",
 
@@ -91,39 +97,41 @@ class WhatsAppWebClass:
             "message_group":"//div[@class='_amjv _aotl']",
             "config_group":"//div[@class='x13mwh8y x1q3qbx4 x1wg5k15 x1bnvlk4 x1n2onr6 x1c4vz4f x2lah0s xdl72j9 x13x2ugz xexx8yu x18d9i69 xyorhqc xkhd6sd x4uap5']",
             "text_chat":"//div[@class='x1hx0egp x6ikm8r x1odjw0f x1k6rcq7 x6prxxf']",
-            "text_info_member":".//span[@class = 'x1iyjqo2 x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft x1rg5ohu _ao3e']",
+            "text_info_member":"//span[@class = 'x1iyjqo2 x6ikm8r x10wlt62 x1n2onr6 xlyipyv xuxw1ft x1rg5ohu _ao3e']",
             "p_search":"//p[@class = 'selectable-text copyable-text x15bjb6t x1n2onr6']",
-            "opciones_mimebors_children":".//div[@class = 'x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x1nhvcw1 x1q0g3np x6s0dn4']",
-            "target_mensaje":".//div[@class='_akbu']",
-            "target_info_member":".//div[@class = 'x10l6tqk xh8yej3 x1g42fcv']",
-            "copyable_text_arg":".//div[contains(@class, 'copyable-text')]",
-            "tag_member_to_command":".//span[@class = 'x1ypdohk x1a06ls3 _ao3e selectable-text select-all copyable-text']",
-            "input_config_chat":".//div[@class='xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x13a6bvl x1q0g3np x6s0dn4 x1c4vz4f x2lah0s x14qfxbe']",
-            "child_input_config_chat":".//div[@class = 'x3nfvp2 xl56j7k x6s0dn4 x1td3qas x1qx5ct2 x7r5mf7 xeyog9w xahult9 x1w4ip6v x1n2onr6 x1ypdohk']",
-            "check_input":".//div[@role='switch']",
+            "opciones_mimebors_children":"//div[@class = 'x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x1nhvcw1 x1q0g3np x6s0dn4']",
+            "target_mensaje":"//div[@class='_akbu']",
+            "target_info_member":"//div[@class = 'x10l6tqk xh8yej3 x1g42fcv']",
+            "copyable_text_arg":"//div[contains(@class, 'copyable-text')]",
+            "tag_member_to_command":"//span[@class = 'x1ypdohk x1a06ls3 _ao3e selectable-text select-all copyable-text']",
+            "input_config_chat":"//div[@class='xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x13a6bvl x1q0g3np x6s0dn4 x1c4vz4f x2lah0s x14qfxbe']",
+            "child_input_config_chat":"//div[@class= 'x3nfvp2 xl56j7k x6s0dn4 x1td3qas x1qx5ct2 x7r5mf7 xeyog9w xahult9 x1w4ip6v x1n2onr6 x1ypdohk']",            
+            "check_input":"//div[input[@aria-label='Enviar mensajes'] and div[@role='switch']]/div[@role='switch']",
             "menu_opciones_message":"//div[@class='_ak4w' and @role = 'application']",
             "menu_option_file":"//div[@class='_ak4w xacj9c0 xfh8nwu xoqspk4 x12v9rci x138vmkv' and @role = 'application']",
             "option_member":"//div[@class = 'x1bnvlk4 x1n2onr6 x1c4vz4f x2lah0s xdl72j9 xyorhqc x13x2ugz']",
             "modal_dialog": "//div[@role='dialog']",
             "solicitud_pendientes":"//div[@title= 'Solicitudes pendientes']",
             "target_solictudes_pendientes":"//div[@class='x1n2onr6 x1c4vz4f x2lah0s xdl72j9 x13x2ugz xat24cr']",
-            "target_solicitud":".//div[@class='x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x1nhvcw1 xdt5ytf x1cy8zhl']",
-            "listitem":".//div[@role='listitem']",
-            "listitem2":".//div[@class='_ak8q']",
-            "li":".//li[@role = 'button']",
-            "sticker": ".//img[starts-with(@alt, 'Sticker')]",
-            "img" : ".//div[@aria-label='Abrir foto']",
-            "video" : ".//span[@data-icon='media-play']",
-            "gif" : ".//span[@data-icon='media-gif']",
-            "voice_record":".//span[@data-icon='audio-play']",
+            "target_solicitud":"//div[@class='x1c4vz4f xs83m0k xdl72j9 x1g77sc7 x78zum5 xozqiw3 x1oa3qoh x12fk4p8 xeuugli x2lwn1j x1nhvcw1 xdt5ytf x1cy8zhl']",
+            "listitem":"//div[@role='listitem']",
+            "listitem2":"//div[@class='_ak8q']",
+            "li":"//li[@role = 'button']",
+            "sticker": "//img[starts-with(@alt, 'Sticker')]",
+            "img" : "//div[@aria-label='Abrir foto']",
+            "video" : "//span[@data-icon='media-play']",
+            "gif" : "//span[@data-icon='media-gif']",
+            "voice_record":"//span[@data-icon='audio-play']",
         }
+
 
     @property
     def attributes(self) -> dict[str, str]:
         """Returns a dictionary of attribute values."""
         return {
             "ahkm":"_ahkm",
-            "data_pre_plain_text":"data-pre-plain-text"
+            "data_pre_plain_text":"data-pre-plain-text",
+            "aria_checked_restringe_chat" : "aria-checked"
         }
 
     @property
@@ -215,6 +223,7 @@ class WhatsAppWebClass:
         Attributes:
             • "ahkm" •
             • "data_pre_plain_text" •
+            •"aria_checked_restringe_chat"•
         
         Limites:
             • "max_video_size_mb" •
@@ -227,4 +236,56 @@ class WhatsAppWebClass:
             "limites":self.limits
         }
 
-        return categories.get(category, {}).get(key, False)
+        cate:dict = categories.get(category,{})
+
+        return cate.get(key, False)
+
+    
+    def get_element(self, selector : str) -> WebElement:
+        """
+        Get element del Entity: 
+
+        Params:
+            selector (str) : Xpath del elemento
+        Returns:
+            Web Element to interactions
+
+        """
+        return self.utils.wait_to_presence_of_element_located(selector = selector)
+
+    def get_elements(self, selector : str) -> list[WebElement]:
+        """
+        Get elements del Entity: 
+
+        Params:
+            selector (str) : Xpath del elemento
+        Returns:
+            List [Web Element] to interactions
+
+        """
+        return self.utils.wait_to_presence_of_all_elements_located(selector = selector)
+
+    def getValueInputRestringeChat(self,case:True)->bool:
+        """Retorna el valor del input de restringe chat"""
+        xpath = self.get_xpath(category="containers",key="check_input")
+        attr = self.get_xpath(category="attributes",key="aria_checked_restringe_chat")
+        """Algoritmo de ingreso a la parte de configuracion de whatssap"""
+        if case:
+            xpath_info = self.get_xpath(category="buttons",key="open_info_group")
+            xpath_group_permission = self.get_xpath( category="buttons",key="group_permission")
+
+            self.utils.wait_to_element_to_be_clickable(selector = xpath_info)
+            self.utils.wait_to_element_to_be_clickable(selector = xpath_group_permission)
+        
+        check : WebElement = self.get_element(selector=xpath)
+
+        value_input = check.get_attribute(name=attr)
+
+        value_input_bool = self.utils.strtoBool(value_input)
+
+        status = "Habilitado" if not value_input_bool else "Inhabilitado"
+        print(f"Hubo un cambio en el restringe chat, ahora esta: {status}")
+
+        self.input_restringe_chat = value_input_bool
+
+        return value_input_bool
