@@ -24,7 +24,10 @@ class WhatsAppWebClass:
     PATRON_HORA_AUTOR = r"\[(\d{1,2}:\d{2}\s?[APM]{2}), .*?\] (.+?):"
     PATRON_LINK_YOUTUBE =  r'(https?://)?(www\.)?((youtube\.com/watch\?v=|youtu\.be/)[\w-]+)'
     QUERY_SELECTOR_MULTIMEDIA = "div[class = '_amk4 _amkt'], div[class = '_amk4 _amkv'], div[class = '_amk4 _amk9'], div[class = '_amk4 _amku']"
-    input_restringe_chat :bool = False #False no esta restringido
+
+    input_restringe_chat :bool = False 
+    bot_to_admins : bool = True
+    admins : list[str] = []
 
     def __init__(self,utils :Utils, bot_id: str = "000 00 0000 0000", group_name: str = "WhatsApp Group"):
         """
@@ -82,7 +85,7 @@ class WhatsAppWebClass:
             "asign_admin":"//button[.//div[contains(text(), 'Designar como admin. del grupo')]]",
             "solicitud_pendientes":"//div[contains(text(),'Solicitudes pendientes')]",
             "see_solicutud":"//div[@role='dialog'].//button[.//span[contains(text(),'Revisa')]]",
-
+            "search_members" : "//div[contains(@class, 'x13mwh8y')]//div[@role='button' and contains(@class, 'x1ypdohk')][.//span[contains(text(), ' miembros')]]"
         }
 
     @property
@@ -184,6 +187,7 @@ class WhatsAppWebClass:
             • asign_admin •
             • solicitud_pendientes •
             • see_solicutud •
+            • search_members •
 
         Containers:
             • chat •
@@ -289,3 +293,17 @@ class WhatsAppWebClass:
         self.input_restringe_chat = value_input_bool
 
         return value_input_bool
+    
+    def getAdminsGroup(self,case : True)->list:
+        """
+        Dara los numeros o nickname de los administradores, para asi confirmar si el autor es admin o no
+        Retornara una lista y cambiara la variable d ela clase self.admins
+
+        Params : 
+            care (boo) : en el caso para evitar unos pasos        
+        
+            ej:
+                Si queremos obtener los miembros, este ya no realizara uno o dos pasos para ver los usuarios
+        """
+
+        

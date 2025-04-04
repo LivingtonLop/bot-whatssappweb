@@ -4,7 +4,7 @@ from src.models.WhatsappWebClass import WhatsAppWebClass
 # from selenium.webdriver.remote.webelement import WebElement
 import pyperclip
 import pyautogui
-
+import time
 class CommandClass:
 
     def __init__(self, driver:webdriver.Chrome,actions:ActionClass,entity:WhatsAppWebClass,config):
@@ -59,12 +59,49 @@ class CommandClass:
             
             status = self.entity.getValueInputRestringeChat(case=False)
             chatSelector = self.entity.get_xpath("containers","chat")
-            if status: #Si es true significa que todos los miembros pueden escribir en el chat.
+            if not status: #Si es False significa que todos los miembros pueden escribir en el chat.
                 """Activar el observer"""
                 self.driver.execute_script("window.reiniciarObserver(arguments[0])",chatSelector)
 
         self.actions.click_in_selector(selector= xpath_back,timeout=self.wait_times["load_labels"])
         self.actions.click_in_selector(selector= xpath_close,timeout=self.wait_times["load_labels"])
+
+
+    def update_members (self):
+        """Algoritmos para obtener los miembros del grupo"""
+        xpath_info = self.entity.get_xpath(category="buttons",key="open_info_group")
+        xpath_search_members = self.entity.get_xpath(category="buttons",key="search_members")
+        xpath_close = self.entity.get_xpath(category="buttons",key="close")
+        xpath_container_list_member = self.entity.get_xpath(category="containers",key="list_member")
+        xpath_items = self.entity.get_xpath(category="containers",key="listitem")
+        xpath_id_name = self.entity.get_xpath(category="containers",key="listitem2")
+
+        
+
+        if (xpath_info,xpath_search_members,xpath_close):
+            self.actions.click_in_selector(selector= xpath_info,timeout=self.wait_times["load_labels"])
+            self.actions.click_in_selector(selector= xpath_search_members,timeout=self.wait_times["load_labels"])
+            
+            time.sleep(1)
+
+            container_member = self.entity.get_element(selector=xpath_container_list_member)
+
+            if not container_member:
+                print("No se encontro el list member")
+                self.actions.click_in_selector(selector= xpath_close,timeout=self.wait_times["load_labels"])
+
+            """Ejecutamos el scrollin"""
+
+            members = self.actions.scrolling_to_scrape_data(container_member = container_member,xpath_items = xpath_items,xpath_id_name=xpath_id_name)
+
+            print(members)
+
+            time.sleep(15)
+
+
+        self.actions.click_in_selector(selector= xpath_close,timeout=self.wait_times["load_labels"])
+        self.actions.click_in_selector(selector= xpath_close,timeout=self.wait_times["load_labels"])
+
 
     def close_session(self):
         """Algoritmo para cerrar la session de la pagina web"""

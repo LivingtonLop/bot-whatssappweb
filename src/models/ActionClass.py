@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.remote.webelement import WebElement
 
 from src.utils import Utils
-
+import pyautogui
 class ActionClass:
 
     def __init__(self,driver:webdriver.Chrome):
@@ -70,6 +70,60 @@ class ActionClass:
                 else:
                     element.send_keys(key)
 
+    @handle_exceptions(NoSuchElementException,StaleElementReferenceException, WebDriverException)
+    def scrolling_to_scrape_data(self,container_member:WebElement,xpath_items:str,xpath_id_name:str)->list:
+        """
+        Se le pasa valores, para el scrolleo
 
+        """    
+        estadistica_pos = 1.2
+        scroll_prox = -1500
+        stop_while = False
+        coor_porcentaje = 0.37
+        data_set = set() #este contendra dos cosas, miembros -> list, admisn -> list
 
+        #iniciando observer/reconectando
+        self.driver.execute_script("window.flagListMember(arguments[0]);",container_member)
+        # Forzar el primer cambio
+        if not self.driver.execute_script("return window.listMemberResponse;"): #se supone que sea false, para oblgarl aentra en el bucle, sino es true no se hace nada
+            self.driver.execute_script("window.listMemberResponse = true;")
+
+        #scrolling
+        while not stop_while:
+            if self.driver.execute_script("return window.listMemberResponse;"):
+
+                items = self.utils.wait_to_presence_of_all_elements_located(selector= xpath_items)
+
+                if not items:
+                    break
+                
+                for i in items:
+                    
+                    id_or_name :WebElement = self.utils.wait_to_presence_of_element_located(selector=xpath_id_name) #Obtenemos los datos id o nickname 
+
+                    if not id_or_name:
+                        continue
+
+                    data_set.add(id_or_name.text)
+
+                element_location = container_member.location
+                element_x, element_y = element_location['x'], element_location['y']
+
+                # Calcular las coordenadas absolutas en la pantalla
+                absolute_x = element_x *coor_porcentaje
+                absolute_y = element_y * estadistica_pos
+
+                self.driver.execute_script("window.listMemberResponse = false;")
+                """scrolling o movimiento"""
+
+                pyautogui.moveTo(absolute_x, absolute_y)
+
+                pyautogui.scroll(scroll_prox)
+
+            else:
+                stop_while = True
+        #desconctando observer
+        self.driver.execute_script("window.desconectarObserverListMember();")
+
+        return list(data_set)
     

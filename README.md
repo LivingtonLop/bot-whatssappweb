@@ -16,7 +16,7 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 
 ---
 
-### 🔧 Administración del Grupo
+### 🔧 Administración del Grupo (No disponible "solo /shh")
 
 - **/all ["asunto"]** - 📢 Menciona a todos los miembros del grupo (excepto el bot), puedes indicar el asunto (campo no obligatorio).
 - **/upmembers** - 🔃 Actualiza la lista de usuarios/miembros del grupo.
@@ -28,7 +28,7 @@ Solo necesitas tener tu computadora con el mouse en la pantalla de la session in
 - **/enlace** -Trae el enlace de invitacion y lo imprime al grupo.
 ---
 
-### 🎵 Multimedia
+### 🎵 Multimedia (No disponible)
 
 - **/audio [enlace de YouTube]** - 🎶 Descarga y envía el audio del video de YouTube en formato MP3 (máximo 16MB).(campo obligatorio).
 - **/sticker** - 🖼️ Convierte una imagen en un sticker de WhatsApp.

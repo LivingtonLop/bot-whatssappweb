@@ -48,10 +48,8 @@ class BotClass:
 
                 if target:
                     text = target.text
-                    if self.detected_author(text = text):
-                        self.detected_command(text=text)
-
-
+                    # if self.detected_author(target= target):
+                    self.detected_command(text=text)
 
             except StaleElementReferenceException as e:
                 print(f"Error, problemas con message, posiblemente eliminado {e}")
@@ -92,8 +90,34 @@ class BotClass:
                     command = getattr(self.list_commands, is_command)
                     self.command_queue.put(lambda args = arguments : command(*args) )
 
-    def detected_author(self,text:str):
-        """Detecta el autor con la cadena de string, retornara lo que es ejemplo True para admins y False para miembros"""
+    def detected_author(self,target:WebElement)->bool:
+        """Detecta el autor con webelement, retornara lo que es ejemplo True para admins y False para miembros"""
+        try:
+            author = None
+
+            if target:
+                text = target.text
+
+                """Vemos si el etxto contiene un numero de telefono o nickname"""
+
+
+
+                """Si no existe nada de numero o nickname, entonces a buscar un div que contengan los datos y verificamos si hay algun dtaos que s epueda
+                usar para verificar si es admins o no """
+
+
+                list_admins = self.whatsappweb.admins
+
+                if author in list_admins:
+                    return True
+
+
+        except StaleElementReferenceException as e:
+            print(f"Error, problemas con message, posiblemente eliminado {e}")
+            return False
+        else:
+            """Caso que no exista ningun author"""
+            return False
 
     def filtrer_words(self,text:str):
         """Filtra las palabras, si encunetra una dentro de los filtros, procedera a elimianr el mensaje o banear al usuario"""
@@ -105,10 +129,12 @@ class BotClass:
             """
             self.pause_event.wait()
             try:
+                # self.pause_event.clear()
                 command = self.command_queue.get(timeout=1)  # Evita bloqueo indefinido
                 """Ejecución del comando"""
                 command()
                 self.command_queue.task_done()
+                # self.pause_event.set()
             except queue.Empty:
                 pass  # Evita que el hilo se bloquee si la cola está vacía
 

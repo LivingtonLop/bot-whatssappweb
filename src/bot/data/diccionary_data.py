@@ -39,8 +39,6 @@ LIST_BLACK = [
     "facuncita",
     "Facuncita",
     "faculo",
-    "tarao",
-    "calla tarao",
     "pasen cp",
     "pedofilo",
     "porno infantil",
@@ -115,15 +113,11 @@ LIST_GREY = [
     "repugnante",
     "tarado",
     "tarada",
-    "degenerado",
-    "degenerada",
     "pendejo",
     "pendeja",
     "chupapijas",
     "come mierda",
-    "hijo de puta",
-    "madre tuya",
-    "padre tuyo"
+    "hijo de puta"
 ]
 
 # Lista de formatos de links que se consideran spam

@@ -66,6 +66,9 @@ class BaseBot(BotClass):
         self.driver.execute_script(load_scripts_js(filename="driver_script.js"))
         self.driver.execute_script(load_scripts_js())
 
+    def load_file_json(self):
+        """Cargamos el archivo json, para que nos de los miembros y admins"""
+
     def execute_scripts(self):
         chatSelector = self.whatsappweb.get_xpath(category="containers", key="chat")  # Asegurar que sea un string
         querySelectorMedia = self.whatsappweb.QUERY_SELECTOR_MULTIMEDIA  # Corrección de nombre
