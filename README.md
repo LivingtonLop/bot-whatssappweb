@@ -1,4 +1,4 @@
-# 📌 Guía de Uso del Bot para WhatsApp
+# 📌 Guía de Uso del Bot para WhatsApp (NO FUNCIONAL, DESPUES DE LA ACTUALIZACION (CAMBIA LOS XPATHS, PUEDE QUE FUNCIONE)
 
 ## 🚀 Introducción
 
